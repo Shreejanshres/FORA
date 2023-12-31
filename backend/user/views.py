@@ -3,9 +3,11 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 import json
-from .models import UserData
-from .serializer import UserDataSerializer
+from .models import *
+from .serializer import *
 from django.contrib.auth import authenticate , login, logout
+from django.contrib.auth.hashers import make_password, check_password
+
 
 #for mail
 from django.core.mail import send_mail
@@ -18,51 +20,76 @@ def signup(request):
     if request.method == "POST":
         data_json = json.loads(request.body)
         serializer = UserDataSerializer(data=data_json)
+        
         if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "done"})  # Added status code and wrapped response in a dictionary
+            user = serializer.save()
+            print(user)
+            # Hash the password before saving to the database
+            user.password = make_password(data_json['password'])
+            user.save()
+            
+            return Response({"sucess":True,"message": "Signup successful"})
         else:
-            return Response({"message":"not valid"})
-    return Response({"message": "The method should be POST"})  # Method not allowed status code
+            # If the data is not valid, return the errors
+            return Response({"sucess":False,"message": "Invalid data", "errors": serializer.errors})
+    return Response({"sucess":False,"message": "The request should be POST"})
+
 
 @api_view(['POST'])
 def login(request):
     if request.method == 'POST':
         data_json = json.loads(request.body)
-        d_name = data_json.get('name')
-        d_email = data_json.get('email') 
-        # print(name,email)
+        email= data_json.get("email")
+        password = data_json.get("password")
         data=UserData.objects.get()
-        print(data)
-        if UserData.objects.filter(name=d_name, email=d_email).exists():
-            return Response("Logged")
-        else :  
-            return Response("not found")
-    return Response("The method should be POST")
+        print("fro user:",email,password)
+        print("from data:",data.email,data.password)
+        try:
+            user=UserData.objects.get(email=email)
+            if check_password(password,user.password):
+                return Response({"sucess":True,"message":"You are logged in"})
+            else :  
+                return Response({"sucess":False,"message":"password doesn't match"})
+        except:
+            return Response({"sucess":False,"message":"User with given email doesn't exist"})
+    return Response({"sucess":False,"message": "The request should be POST"})
 
 @csrf_exempt
+@api_view(['POST'])
 def forgetpassword(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         email = data.get('email')
-        print(email)
-        otp = str(random.randint(100000, 999999))
-        # Compose the email message
-        subject = 'Your OTP for password reset'
-        message = f'Your OTP is {otp}.'
-        from_email = settings.EMAIL_HOST_USER
-        recipient_list = [email]
+        if(UserData.objects.filter(email=email).exists()):
+            otp = str(random.randint(100000, 999999))
+            # Compose the email message
+            subject = 'Your OTP for password reset'
+            message = f'Your OTP is {otp}.'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [email]
         # Send the email using Gmail
-        send_mail(subject, message, from_email,
-                  recipient_list, fail_silently=True)
+            send_mail(subject, message, from_email,recipient_list, fail_silently=True)
         # Store the OTP in the session for later verification
-        request.session['otp'] = otp
-        request.session['email'] = email
-        respose_data = {'otp': otp, 'success': True}
-        return JsonResponse(respose_data)
+            request.session['otp'] = otp
+            request.session['email'] = email
+            saveotp(otp,email)
+            respose_data = {'otp': otp, 'success': True}
+            return Response({"sucess":True,"message":respose_data})
+        else:
+            return Response({"sucess":False,"message":"User with the email doesn't exist"})
     else:
-        return JsonResponse({'success': True, 'message': 'Password changed successfully'})
+        return Response({'success': False, 'message': 'need to be POST'})
+
+def saveotp(otp,email):
+    serialized=OtpLogSerializer(data={otp,email})
+    if serialized.is_valid():
+        serialized.save()
+    else:
+        # If the data is not valid, return the errors
+        return Response({"sucess":False,"message": "Invalid data", "errors": serialized.errors})   
     
+
+
 @csrf_exempt
 def updatepassword(request):
     if request.method=='POST':

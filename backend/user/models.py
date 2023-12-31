@@ -6,6 +6,15 @@ class UserData(models.Model):
     password=models.CharField()
     address=models.CharField()
     phonenumber=models.CharField()
+
     def __str__(self):
         return self.name
 
+class OtpLog(models.Model):
+    email=models.CharField()
+    otp=models.CharField()
+    is_active=models.BooleanField(default=True)
+    created_time=models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.is_active
