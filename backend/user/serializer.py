@@ -8,5 +8,5 @@ class UserDataSerializer(serializers.ModelSerializer):
 
 class OtpLogSerializer(serializers.ModelSerializer):
     class Meta:
-        models=OtpLog
+        model=OtpLog
         fields = '__all__'

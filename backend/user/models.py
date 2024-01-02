@@ -17,4 +17,4 @@ class OtpLog(models.Model):
     created_time=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.is_active
+        return str(self.is_active)
