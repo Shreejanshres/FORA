@@ -86,7 +86,7 @@ def forgetpassword(request):
                 request.session['otp'] = otp
                 request.session['otp_timestamp'] = str(timestamp)
                 request.session['email'] = email
-                saveotp(email,otp)
+                
                 respose_data = {'otp': otp, 'success': True}
                 return JsonResponse({"sucess":True,"message":respose_data})
             else:
