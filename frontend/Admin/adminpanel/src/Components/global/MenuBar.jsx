@@ -40,22 +40,31 @@ export default function MenuBar() {
   const [selected, setSelected] = useState("Dashboard");
 
   return (
-    <Sidebar collapsed={isCollapsed} backgroundColor={colors.primary[800]}>
+    <Sidebar
+      collapsed={isCollapsed}
+      backgroundColor={
+        theme.palette.mode === "dark"
+          ? colors.primary[800]
+          : colors.blueAccent[500]
+      }
+    >
+
       <Menu
         menuItemStyles={{
           button: {
             "&:hover": {
               backgroundColor: "transparent",
               color: colors.blueAccent[500],
+              color:theme.palette.mode==="dark"? colors.blueAccent[500]: colors.grey[800],
             },
             "&:active": {
               backgroundColor: colors.blueAccent[400],
               color: colors.greenAccent[500],
             },
-            "::after":{
-                color:"red",
-                backgroundColor:"red"
-            }
+            "::after": {
+              color: "red",
+              backgroundColor: "red",
+            },
           },
         }}
       >
@@ -106,7 +115,7 @@ export default function MenuBar() {
         <Box
           paddingLeft={isCollapsed ? undefined : "0"}
           mt={6}
-          alignItems={'center'}
+          alignItems={"center"}
         >
           <Item
             title="Dashboard"
