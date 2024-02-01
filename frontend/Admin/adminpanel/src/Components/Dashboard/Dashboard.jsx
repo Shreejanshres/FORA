@@ -4,7 +4,7 @@ const Dashboard = () => {
     return (
         <Box
             component="main"
-            sx={{ flexGrow: 1, ml: "240px", bgcolor: 'background.default', p: 3 }}
+            sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
         >
             <h1> Dashboard</h1>
         </Box>
