@@ -19,7 +19,7 @@ from django.conf import settings
 import random
 
 @csrf_exempt
-@api_view(['POST'])
+# @api_view(['POST'])
 def signup(request):
     if request.method == "POST":
         data_json = json.loads(request.body)
@@ -45,9 +45,6 @@ def login(request):
         data_json = json.loads(request.body)
         email= data_json.get("email")
         password = data_json.get("password")
-        data=UserData.objects.get()
-        print("fro user:",email,password)
-        print("from data:",data.email,data.password)
         try:
             user=UserData.objects.get(email=email)
             if check_password(password,user.password):

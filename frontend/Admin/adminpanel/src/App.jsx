@@ -7,7 +7,7 @@ import "./App.css";
 import MenuBar from "./Components/global/MenuBar";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import Topbar from "./Components/global/Topbar";
-
+import Restaurant from "./Components/Restaurant/Restaurant";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -25,6 +25,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/restaurant" element={<Restaurant />} />
             </Routes>
           </main>
         </div>

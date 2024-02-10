@@ -48,14 +48,16 @@ export default function MenuBar() {
           : colors.blueAccent[500]
       }
     >
-
       <Menu
         menuItemStyles={{
           button: {
             "&:hover": {
               backgroundColor: "transparent",
               color: colors.blueAccent[500],
-              color:theme.palette.mode==="dark"? colors.blueAccent[500]: colors.grey[800],
+              color:
+                theme.palette.mode === "dark"
+                  ? colors.blueAccent[500]
+                  : colors.grey[800],
             },
             "&:active": {
               backgroundColor: colors.blueAccent[400],

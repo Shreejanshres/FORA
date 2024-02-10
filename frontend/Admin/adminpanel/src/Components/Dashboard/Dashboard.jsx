@@ -12,9 +12,7 @@ const Data = ({ title, value, icon: IconComponent }) => {
     <Box
       display="flex"
       sx={{
-        border: theme.palette.mode === "dark"
-        ? `1px solid`
-        : undefined,
+        border: theme.palette.mode === "dark" ? `1px solid` : undefined,
         borderColor: colors.primary[600],
         borderLeft: "5px solid",
         borderLeftColor: colors.redAccent[500],
@@ -42,8 +40,11 @@ const Dashboard = () => {
   const colors = tokens(theme.palette.mode);
   return (
     <Box
-      component="main"
-      sx={{ flexGrow: 1, bgcolor: "background.default", ml: 3 }}
+      sx={{
+        flexGrow: 1,
+        bgcolor: "background.default",
+        ml: 3,
+      }}
     >
       <Box>
         <Typography variant="h1" fontWeight="bold">

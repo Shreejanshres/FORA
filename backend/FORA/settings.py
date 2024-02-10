@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'user.apps.UserConfig', 
     'restaurant.apps.RestaurantConfig',
+    'admins.apps.AdminsConfig', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
