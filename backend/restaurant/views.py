@@ -4,23 +4,65 @@ from rest_framework.decorators import api_view
 import json
 from django.contrib.auth.hashers import make_password, check_password
 
-from .models import restaurantData
+from .models import *
+from .serializers import *
+def response(success, message):
+    return JsonResponse({"success": success, "message": message})
+
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
         data_json = json.loads(request.body)
         email= data_json.get("email")
         password = data_json.get("password")
-        data=restaurantData.objects.get()
-        print("fro user:",email,password)
-        print("from data:",data.email,data.password)
         try:
-            user=restaurantData.objects.get(email=email)
+            user=RestaurantData.objects.get(email=email)
             if check_password(password,user.password):
-                return JsonResponse({"sucess":True,"message":"You are logged in"})
+                 return response(True,"Logged in successfully")
             else :  
-                return JsonResponse({"sucess":False,"message":"password doesn't match"})
+                return response(False,"password doesn't match")
         except:
-            return JsonResponse({"sucess":False,"message":"User with given email doesn't exist"})
-    return JsonResponse({"sucess":False,"message": "The request should be POST"})
+            return response(False,"User with given email doesn't exist")
+    else:
+        return response(False,"The method should be POST")
+    
+@csrf_exempt
+def addtags(request):
+    if request.method=="POST":
+        data_json=json.loads(request.body)
+        serializer=TagSerializer(data=data_json,many=False)
+        if  serializer.is_valid():
+            serializer.save()
+            return response(True,"Tags added successfully")
+        else:
+            return  response(False,str(serializer.errors))
+    else:
+        return response(False,"The method should be POST")
 
+@csrf_exempt
+def addmenu(request):
+    if  request.method=='POST':
+        data_json=json.loads(request.body)
+        serializer=MenuSerializer(data=data_json,many=False)
+        if  serializer.is_valid():
+            serializer.save()
+            return response(True,"Menu added successfully")
+        else:
+            return  response(False,str(serializer.errors))
+    else:
+        return response(False,"The method should be POST")
+
+@csrf_exempt
+def viewmenu(request):
+    if request.method=="GET":
+        data=json.loads(request.body)
+        id=data.get( "id" )
+        tag=data.get("tag")
+        try:
+            menuitem=Menu.objects.filter(restaurant=id)
+            serialized=MenuSerializer(menuitem,many=True)
+            return  JsonResponse(serialized.data,safe=False)
+        except:
+            return  response( False , "No Menu found for this restaurant" )
+    else:
+        return response(False,"The method should be GET")

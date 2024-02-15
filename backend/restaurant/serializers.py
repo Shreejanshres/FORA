@@ -11,3 +11,14 @@ class RestaurantDataSerializer(serializers.ModelSerializer):
         # Remove the 'password' field from the serialized data
         data.pop('password', None)
         return data
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Tags
+        fields='__all__'
+
+class MenuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Menu
+        fields='__all__'
+        extra_kwargs = {'picture': {'required': False}}

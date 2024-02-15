@@ -8,7 +8,7 @@ from .models import *
 from .serializers import *
 
 from restaurant.models import RestaurantData
-from restaurant.serializer import RestaurantDataSerializer
+from restaurant.serializers import RestaurantDataSerializer
 
 
 
@@ -78,3 +78,4 @@ def getrestaurantdata(request):
         # return  JsonResponse(RestaurantDataviews.as_view()(request))
     else:
         return response(False,"The method should be GET")
+    

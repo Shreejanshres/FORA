@@ -18,16 +18,17 @@ const table = ({ columns, data }) => {
       <Paper
         sx={{
           width: "100%",
-          overflow: "hidden",
-          borderRadius: "15px",
+          borderRadius: "15px 15px 0 0",
         }}
-        square={false}
+        // square={false}
         elevation={5}
         // variant="outlined"
       >
         <TableContainer
           sx={{
-            maxHeight: "75vh",
+            maxHeight: "73vh",
+
+            borderRadius: "15px 15px 0 0",
             backgroundColor:
               theme.palette.mode === "dark" ? colors.primary[600] : "white",
           }}

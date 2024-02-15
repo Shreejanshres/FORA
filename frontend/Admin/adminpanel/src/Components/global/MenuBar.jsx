@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import RestaurantOutlinedIcon from "@mui/icons-material/RestaurantOutlined";
@@ -8,12 +8,14 @@ import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { Link } from "react-router-dom";
 
 import { tokens } from "../../Theme";
 import { Title } from "@mui/icons-material";
 import { red } from "@mui/material/colors";
-const drawerWidth = 240;
+
+const isAdminPath = window.location.pathname.includes("/admin");
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -32,7 +34,94 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
     </MenuItem>
   );
 };
-
+const AdminItem = ({ isCollapsed, selected, setSelected }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  return (
+    <Box paddingLeft={isCollapsed ? undefined : "10%"} mt={6}>
+      <Item
+        title="Dashboard"
+        to="/admin/dashboard"
+        icon={<HomeOutlinedIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+      <Divider />
+      <Typography
+        variant="h6"
+        color={colors.grey[300]}
+        sx={{ m: "15px 0 5px 20px" }}
+      >
+        Data
+      </Typography>
+      <Item
+        title="Restaurant"
+        to="/admin/restaurant"
+        icon={<RestaurantOutlinedIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+      <Item
+        title="Admins"
+        to="/admin/admin"
+        icon={<AdminPanelSettingsIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+      <Item
+        title="Payment"
+        to="/admin/payment"
+        icon={<PaymentsOutlinedIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+    </Box>
+  );
+};
+const RestaurantItem = ({ isCollapsed, selected, setSelected }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  return (
+    <Box paddingLeft={isCollapsed ? undefined : "10%"} mt={6}>
+      <Item
+        title="Dashboard"
+        to="/restaurant/dashboard"
+        icon={<HomeOutlinedIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+      <Divider />
+      <Typography
+        variant="h6"
+        color={colors.grey[300]}
+        sx={{ m: "15px 0 5px 20px" }}
+      >
+        Data
+      </Typography>
+      <Item
+        title="Staff"
+        to="/admin/restaurant"
+        icon={<RestaurantOutlinedIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+      <Item
+        title="Orders"
+        to="/admin/admin"
+        icon={<AdminPanelSettingsIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+      <Item
+        title="Payment"
+        to="/admin/payment"
+        icon={<PaymentsOutlinedIcon />}
+        selected={selected}
+        setSelected={setSelected}
+      />
+    </Box>
+  );
+};
 export default function MenuBar() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -114,33 +203,19 @@ export default function MenuBar() {
             </Typography>
           </Box>
         )}
-        <Box
-          paddingLeft={isCollapsed ? undefined : "0"}
-          mt={6}
-          alignItems={"center"}
-        >
-          <Item
-            title="Dashboard"
-            to="/dashboard"
-            icon={<HomeOutlinedIcon />}
+        {isAdminPath ? (
+          <AdminItem
+            isCollapsed={isCollapsed}
             selected={selected}
             setSelected={setSelected}
           />
-          <Item
-            title="Restaurant"
-            to="/restaurant"
-            icon={<RestaurantOutlinedIcon />}
+        ) : (
+          <RestaurantItem
+            isCollapsed={isCollapsed}
             selected={selected}
             setSelected={setSelected}
           />
-          <Item
-            title="Payment"
-            to="/payment"
-            icon={<PaymentsOutlinedIcon />}
-            selected={selected}
-            setSelected={setSelected}
-          />
-        </Box>
+        )}
       </Menu>
     </Sidebar>
   );
