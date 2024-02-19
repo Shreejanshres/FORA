@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'restaurant.apps.RestaurantConfig',
     'admins.apps.AdminsConfig', 
     'django.contrib.admin',
+    'corsheaders',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -52,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -166,3 +169,9 @@ CELERY_RESULT_SERIALIZER="json"
 CELERY_TASK_SERIALIZER='json'
 
 CELERY_RESULT_BACKEND='django-db'
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Replace with the origin of your frontend
+]
+CORS_ALLOW_CREDENTIALS = True

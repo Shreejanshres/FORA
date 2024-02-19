@@ -12,12 +12,13 @@ import {
   FormControl,
   Typography,
 } from "@mui/material";
-
+import axios from "axios";
 import { tokens } from "../../Theme";
 
 const Login = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -26,8 +27,15 @@ const Login = () => {
   const handleTogglePassword = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
+  const postdata = {
+    email: email,
+    password: password,
+  };
   const HandleClick = () => {
-    alert(`Email: ${email}\nPassword: ${password}`);
+    // alert(`Email: ${email}\nPassword: ${password}`);
+    // alert(postdata);
+    const response = axios.post("http://127.0.0.1:8000/admins/", postdata);
+    console.log(response);
   };
 
   return (
