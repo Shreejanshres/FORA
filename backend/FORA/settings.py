@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!+iin1@2&nw-fr8a@3h2d#eqsb$mseyy#=c-wq77w=g@0i&2x9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.66',]
 
 
 # Application definition
@@ -157,6 +157,7 @@ EMAIL_USE_SSL = False
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    
 ]
 # Allow cross-site request forgery protection for AJAX requests
 CSRF_COOKIE_NAME = "csrftoken"

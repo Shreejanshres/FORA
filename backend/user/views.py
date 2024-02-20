@@ -39,7 +39,7 @@ def signup(request):
     return JsonResponse({"sucess":False,"message": "The request should be POST"})
 
 
-@api_view(['POST'])
+@csrf_exempt
 def login(request):
     if request.method == 'POST':
         data_json = json.loads(request.body)
