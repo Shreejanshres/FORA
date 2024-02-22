@@ -2,6 +2,8 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
+from django.core.serializers.json import DjangoJSONEncoder
+
 import json
 
 from .models import *
@@ -32,11 +34,11 @@ def signup(request):
             user.password = make_password(data_json['password'])
             user.save()
             
-            return JsonResponse({"sucess":True,"message": "Signup successful"})
+            return JsonResponse({"success":True,"message": "Signup successful"})
         else:
             # If the data is not valid, return the errors
-            return JsonResponse({"sucess":False,"message": "Invalid data", "errors": serializer.errors})
-    return JsonResponse({"sucess":False,"message": "The request should be POST"})
+            return JsonResponse({"success":False,"message": "Invalid data", "errors": serializer.errors})
+    return JsonResponse({"success":False,"message": "The request should be POST"})
 
 
 @csrf_exempt
@@ -45,15 +47,18 @@ def login(request):
         data_json = json.loads(request.body)
         email= data_json.get("email")
         password = data_json.get("password")
+        print(email,password)
         try:
             user=UserData.objects.get(email=email)
+            resposedata=UserDataSerializer(user)
+           
             if check_password(password,user.password):
-                return JsonResponse({"sucess":True,"message":"You are logged in"})
+                return JsonResponse({"success":True,"message":resposedata.data},encoder=DjangoJSONEncoder)
             else :  
-                return JsonResponse({"sucess":False,"message":"password doesn't match"})
+                return JsonResponse({"success":False,"message":"password doesn't match"})
         except:
-            return JsonResponse({"sucess":False,"message":"User with given email doesn't exist"})
-    return JsonResponse({"sucess":False,"message": "The request should be POST"})
+            return JsonResponse({"success":False,"message":"User with given email doesn't exist"})
+    return JsonResponse({"success":False,"message": "The request should be POST"})
 
 @csrf_exempt
 def forgetpassword(request):
@@ -77,17 +82,18 @@ def forgetpassword(request):
                 from_email = settings.EMAIL_HOST_USER
                 recipient_list = [email]
             # Send the email using Gmail
-                # send_mail(subject, message, from_email,recipient_list, fail_silently=True)
+                send_mail(subject, message, from_email,recipient_list, fail_silently=True)
             # Store the OTP in the session for later verification
+                saveotp(email, otp)
                 timestamp = datetime.now().timestamp()  # Current timestamp
                 request.session['otp'] = otp
                 request.session['otp_timestamp'] = str(timestamp)
                 request.session['email'] = email
                 
-                respose_data = {'otp': otp, 'success': True}
-                return JsonResponse({"sucess":True,"message":respose_data})
+                respose_data = {'otp': otp}
+                return JsonResponse({"success":True,"message":respose_data})
             else:
-                return JsonResponse({"sucess":False,"message":"User with the email doesn't exist"})
+                return JsonResponse({"success":False,"message":"User with the email doesn't exist"})
     else:
         return JsonResponse({'success': False, 'message': 'need to be POST'})
   
@@ -114,8 +120,8 @@ def validate_otp(request):
         data=json.loads(request.body)
         email=data.get('email')
         otp=data.get('otp')
-
-        valid= OtpLog.objects.filter(email=email,otp=otp,is_active=True)
+        print(email,otp)
+        valid= OtpLog.objects.filter(email=email,otp=otp,is_active=True).exists()
         print(valid)
         if valid:
             OtpLog.objects.filter(email=email, is_active=True).update(is_active=False)
