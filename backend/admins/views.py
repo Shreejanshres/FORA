@@ -64,6 +64,39 @@ def adminlogin(request):
         return response(False,"The method should be POST")
 
 @csrf_exempt
+def get_data(request):
+    # The user is authenticated, and you can access user data
+    user = request.user
+    jwt_token = request.headers.get("Authorization")
+
+    if jwt_token:
+        try:
+           
+            payload = jwt.decode(jwt_token.split(" ")[1], "secret", algorithms=["HS256"])
+            user = AdminData.objects.get(id=payload["id"])
+            data = {
+                "id": user.id,
+                "email": user.email,
+                "name": user.name,
+                "address": user.address,
+                "phone": user.phonenumber,
+
+            }
+            return response(True,data)
+        except:
+            return response(False,"Token has expired")
+        
+    # Your logic to retrieve and send data
+    data = {
+        "id": user.id,
+        "email": user.email,
+        "name": user.name,
+        # Add other fields as needed
+    }
+
+    
+
+@csrf_exempt
 def addrestaurant(request):
     if request.method=="POST":
         restaurantdata = json.loads(request.body)

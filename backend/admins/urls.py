@@ -5,5 +5,5 @@ urlpatterns = [
     path('adminsignup/',adminsignup,name="adminsignup"),
     path('addrestaurant/',addrestaurant,name="addrestaurant"),
     path('viewrestaurant/',getrestaurantdata,name="getrestaurantdata"),
-    
+     path('getdata/',get_data,name="getrestaurantdata"),
 ]

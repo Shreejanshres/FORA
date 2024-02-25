@@ -2,12 +2,37 @@ import { Box, Grid, Icon, Typography, useTheme } from "@mui/material";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import PeopleIcon from "@mui/icons-material/People";
-
+import { jwtDecode } from "jwt-decode";
 import { tokens } from "../../Theme";
-import React from "react";
+import React, { useEffect } from "react";
+import axios from "axios";
+
 const Data = ({ title, value, icon: IconComponent }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Check if the token exists
+    if (token) {
+      // Send the token to the backend for data retrieval
+      axios
+        .get("http://127.0.0.1:8000/admin/getdata/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          // Handle the data from the backend
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    }
+  }, []);
+
   return (
     <Box
       display="flex"

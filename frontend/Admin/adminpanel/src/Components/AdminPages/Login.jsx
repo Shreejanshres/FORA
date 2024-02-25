@@ -3,7 +3,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Backgroundfood from "../../assets/foodbackground.jpg";
 import { useNavigate } from "react-router-dom";
-import "jwt-decode";
 import {
   InputAdornment,
   Box,
