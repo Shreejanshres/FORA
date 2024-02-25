@@ -100,21 +100,21 @@ const RestaurantItem = ({ isCollapsed, selected, setSelected }) => {
       </Typography>
       <Item
         title="Staff"
-        to="/admin/restaurant"
+        to="/restaurant/restaurant"
         icon={<RestaurantOutlinedIcon />}
         selected={selected}
         setSelected={setSelected}
       />
       <Item
         title="Orders"
-        to="/admin/admin"
+        to="/restaurant/admin"
         icon={<AdminPanelSettingsIcon />}
         selected={selected}
         setSelected={setSelected}
       />
       <Item
         title="Payment"
-        to="/admin/payment"
+        to="/restaurant/payment"
         icon={<PaymentsOutlinedIcon />}
         selected={selected}
         setSelected={setSelected}

@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Backgroundfood from "../../assets/foodbackground.jpg";
-import { useNavigate } from "react-router-dom";
-import "jwt-decode";
 import {
   InputAdornment,
   Box,
@@ -16,10 +14,8 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { tokens } from "../../Theme";
-import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
-  const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -35,24 +31,11 @@ const Login = () => {
     email: email,
     password: password,
   };
-
-  const HandleClick = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/admin/",
-        postdata
-      );
-      const { message } = response.data;
-      console.log(message);
-      const decoded = jwtDecode(message);
-      console.log(decoded);
-      localStorage.setItem("token", message);
-      navigate("/admin/dashboard");
-    } catch (error) {
-      console.error("Error:", error);
-      // Handle the error, e.g., show an error message to the user
-    }
+  const HandleClick = () => {
+    // alert(`Email: ${email}\nPassword: ${password}`);
+    // alert(postdata);
+    const response = axios.post("http://127.0.0.1:8000/admin/", postdata);
+    console.log(response);
   };
 
   return (

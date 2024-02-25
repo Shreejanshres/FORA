@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['192.168.1.66','127.0.0.1','192.168.1.103']
 
 INSTALLED_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
     'user.apps.UserConfig', 
     'restaurant.apps.RestaurantConfig',
     'admins.apps.AdminsConfig', 
@@ -62,7 +63,11 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        # ... other authentication classes if needed
+    ],
 }
 ROOT_URLCONF = 'FORA.urls'
 USE_TZ = True

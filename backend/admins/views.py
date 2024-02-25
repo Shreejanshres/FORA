@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import jwt
 from rest_framework.decorators import api_view
 import json
 from django.contrib.auth.hashers import make_password, check_password
@@ -10,7 +11,7 @@ from .serializers import *
 from restaurant.models import RestaurantData
 from restaurant.serializers import RestaurantDataSerializer
 
-
+from django.core.serializers.json import DjangoJSONEncoder
 
 def response(success, message):
     return JsonResponse({"success": success, "message": message})
@@ -43,12 +44,22 @@ def adminlogin(request):
         password = data_json.get("password")
         try:
             user=AdminData.objects.get(email=email)
+            print(user,user.email)
+            responsedata=AdminDataSerializer(user)
             if check_password(password,user.password):
-                return response(True,"Logged in successfully")
+                payload={
+                    "id":user.id,
+                    "email":user.email,
+                    "name":user.name,
+                    "phone":user.phonenumber,
+                    "address":user.address,
+                }
+                token = jwt.encode(payload, "secret", algorithm="HS256")
+                return JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
             else :  
                 return response(False,"password doesn't match")
-        except:
-            return response(False,"User with given email doesn't exist")
+        except Exception as e:
+            return response(False,e)
     else:
         return response(False,"The method should be POST")
 

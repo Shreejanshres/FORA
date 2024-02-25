@@ -50,10 +50,10 @@ def login(request):
         print(email,password)
         try:
             user=UserData.objects.get(email=email)
-            resposedata=UserDataSerializer(user)
+            responsedata=UserDataSerializer(user)
            
             if check_password(password,user.password):
-                return JsonResponse({"success":True,"message":resposedata.data},encoder=DjangoJSONEncoder)
+                return JsonResponse({"success":True,"message":responsedata.data},encoder=DjangoJSONEncoder)
             else :  
                 return JsonResponse({"success":False,"message":"password doesn't match"})
         except:
