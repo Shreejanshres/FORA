@@ -12,9 +12,8 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { Link } from "react-router-dom";
 
 import { tokens } from "../../Theme";
-import { Title } from "@mui/icons-material";
-import { red } from "@mui/material/colors";
-
+import { useEffect } from "react";
+import axios from "axios";
 const isAdminPath = window.location.pathname.includes("/admin");
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -127,7 +126,29 @@ export default function MenuBar() {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-
+  const [name, setName] = useState("");
+  console.log(name);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    // Check if the token exists
+    if (token) {
+      // Send the token to the backend for data retrieval
+      axios
+        .get("http://127.0.0.1:8000/admin/getdata/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          // Handle the data from the backend
+          console.log(response.data);
+          setName(response.data.message.name.toUpperCase());
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    }
+  }, []);
   return (
     <Sidebar
       collapsed={isCollapsed}
@@ -199,7 +220,7 @@ export default function MenuBar() {
               Welcome back
             </Typography>
             <Typography variant="h4" fontWeight={"bold"}>
-              Shreejan Shrestha
+              {name}
             </Typography>
           </Box>
         )}

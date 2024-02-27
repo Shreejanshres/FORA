@@ -85,14 +85,7 @@ def get_data(request):
             return response(True,data)
         except:
             return response(False,"Token has expired")
-        
-    # Your logic to retrieve and send data
-    data = {
-        "id": user.id,
-        "email": user.email,
-        "name": user.name,
-        # Add other fields as needed
-    }
+ 
 
     
 

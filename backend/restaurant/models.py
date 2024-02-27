@@ -4,10 +4,12 @@ from django.db import models
 class RestaurantData(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    password=models.CharField()
-    address=models.CharField()
-    phonenumber=models.CharField()
-    delivery_time=models.CharField()
+    password=models.CharField(max_length=255)
+    ownername=models.CharField(max_length=50)
+    address=models.CharField(max_length=100)
+    phonenumber=models.CharField(max_length=15)
+    delivery_time=models.CharField(max_length=5)
+    picture=models.ImageField(upload_to='restaurant/')
 
     def __str__(self):
         return self.name
