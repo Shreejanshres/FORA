@@ -125,9 +125,9 @@ const Restaurant = () => {
           }}
           onClick={() => setOpen(!open)}
         >
-          Add Restaurant
+          Add Menu
         </Button>
-        <Popup open={open} close={handleclose} title="Add Restaurant" />
+        <Popup open={open} close={handleclose} title="Add Menu" />
       </Box>
       <Box m="20px 0 0 0">
         <Table columns={columns} data={rows} />

@@ -98,8 +98,8 @@ const RestaurantItem = ({ isCollapsed, selected, setSelected }) => {
         Data
       </Typography>
       <Item
-        title="Staff"
-        to="/restaurant/restaurant"
+        title="Menu"
+        to="/restaurant/menu"
         icon={<RestaurantOutlinedIcon />}
         selected={selected}
         setSelected={setSelected}

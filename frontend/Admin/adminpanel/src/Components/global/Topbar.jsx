@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // import axios from "axios";
 import InputBase from "@mui/material/InputBase";
-
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
@@ -51,8 +50,12 @@ const Topbar = () => {
 
   const handlelogout = () => {
     sessionStorage.clear();
-    window.location.href = "/admin ";
-  }
+    if (window.location.pathname.includes("/admin")) {
+      window.location.href = "/admin";
+    } else {
+      window.location.href = "/restaurant";
+    }
+  };
   return (
     <Box display="flex" justifyContent="right" m={3} mb={0}>
       <IconButton onClick={colorMode.toggleColorMode} mr="4px">
@@ -107,9 +110,7 @@ const Topbar = () => {
               </Typography>
             </Box>
           </MenuItem>
-          <MenuItem onClick={handlelogout}>
-            Log Out
-          </MenuItem>
+          <MenuItem onClick={handlelogout}>Log Out</MenuItem>
         </Select>
       </FormControl>
       {/* <Box
