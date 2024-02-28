@@ -19,6 +19,13 @@ class TagSerializer(serializers.ModelSerializer):
 
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Menu
+        model=MenuItem
         fields='__all__'
         extra_kwargs = {'picture': {'required': False}}
+
+class HeadingSerializer(serializers.ModelSerializer):
+    menuitem_set = MenuSerializer(many=True, read_only=True)
+    class Meta:
+        model=Heading
+        fields='__all__'
+        extra_kwargs = {'restaurant': {'required': False}}
