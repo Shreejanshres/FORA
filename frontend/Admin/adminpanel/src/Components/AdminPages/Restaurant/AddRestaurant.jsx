@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { tokens } from "../../../Theme";
 import styled from "@emotion/styled";
-
+import axios from "axios";
 const CustomTextField = styled(TextField)({});
 function AddRestaurant({ open, close, title, data }) {
   const theme = useTheme();
@@ -24,8 +24,22 @@ function AddRestaurant({ open, close, title, data }) {
   const [email, setEmail] = useState("");
 
   const handleSubmit = () => {
-    alert("This will close");
-    close();
+    data = {
+      name: companyname,
+      ownername: ownername,
+      address: address,
+      phonenumber: phone,
+      email: email,
+    };
+    axios
+      .post("http://127.0.0.1:8000/admin/addrestaurant/", data)
+      .then((response) => {
+        console.log(response.data);
+        if (response.data["success"] === true) {
+          alert("Restaurant added successfully");
+          close();
+        }
+      });
   };
 
   return (

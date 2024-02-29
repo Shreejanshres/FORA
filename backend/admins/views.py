@@ -7,7 +7,10 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate, login
 from .models import *
 from .serializers import *
-
+import random
+import string
+from django.core.mail import send_mail
+from django.conf import settings
 from restaurant.models import RestaurantData
 from restaurant.serializers import RestaurantDataSerializer
 
@@ -44,8 +47,7 @@ def adminlogin(request):
         password = data_json.get("password")
         try:
             user=AdminData.objects.get(email=email)
-            print(user,user.email)
-            responsedata=AdminDataSerializer(user)
+
             if check_password(password,user.password):
                 payload={
                     "id":user.id,
@@ -95,10 +97,17 @@ def addrestaurant(request):
         restaurantdata = json.loads(request.body)
         serializer=RestaurantDataSerializer(data=restaurantdata)
         if serializer.is_valid():
-            user= serializer.save()
-            print(user)
-            user.password=make_password(restaurantdata['password'])
-            user.save()
+            random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+            hased_password = make_password(random_password)           
+            serializer.validated_data['password'] = hased_password
+            print(random_password,hased_password)
+            user=serializer.save()
+            subject = 'Creation of Account'
+            message = f'Welcome {user.name},\nYour account has been created in FoodFuse. You can use your email: {user.email} and password:{random_password} for login. We encourage to change the password at first. Welcome to our team.'            
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [user.email]
+        # Send the email using Gmail
+            send_mail(subject, message, from_email,recipient_list, fail_silently=True)
             return response(True,"Restaurant added successfully")
         else:
             return response(False,serializer.errors)

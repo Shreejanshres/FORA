@@ -7,11 +7,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Popup from "./AddRestaurant.jsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 const columns = [
   { field: "id", headerName: "ID" },
   {
-    field: "restaurant",
+    field: "name",
     headerName: "Restaurant  Name",
     editable: true,
   },
@@ -21,7 +22,7 @@ const columns = [
     editable: true,
   },
   {
-    field: "phone",
+    field: "phonenumber",
     headerName: "Phone",
     type: "number",
     editable: true,
@@ -33,22 +34,23 @@ const columns = [
     editable: true,
   },
   {
-    field: "ownerName",
+    field: "ownername",
     headerName: "Owner Name",
     editable: true,
   },
 ];
 
-const rows = [
-  {
-    id: 1,
-    restaurant: "foodhub by H2O",
-    address: "Jhochhen",
-    phone: "9841385218",
-    email: "foodhub@gmail.com",
-    ownerName: "John Doe",
-  },
-];
+// const rows = [
+//   {
+//     id: 1,
+//     restaurant: "foodhub by H2O",
+//     address: "Jhochhen",
+//     phone: "9841385218",
+//     email: "foodhub@gmail.com",
+//     ownerName: "John Doe",
+//   },
+// ];
+
 const CssTextField = styled(TextField)({
   "& label.Mui-focused": {
     color: "#A0AAB4",
@@ -72,10 +74,22 @@ const Restaurant = () => {
   const colors = tokens(theme.palette.mode);
 
   const [open, setOpen] = useState(false);
+  const [rows, setRows] = useState([]);
   const handleclose = () => {
     setOpen(false);
   };
-
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/admin/viewrestaurant/")
+      .then((response) => {
+        // Handle the data from the backend
+        console.log(response.data);
+        setRows(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
   return (
     <Box ml={3} mr={5}>
       <Box>

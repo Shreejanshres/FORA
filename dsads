@@ -1,0 +1,361 @@
+[1mdiff --git a/backend/admins/views.py b/backend/admins/views.py[m
+[1mindex ef5e192..10f118a 100644[m
+[1m--- a/backend/admins/views.py[m
+[1m+++ b/backend/admins/views.py[m
+[36m@@ -7,11 +7,15 @@[m [mfrom django.contrib.auth.hashers import make_password, check_password[m
+ from django.contrib.auth import authenticate, login[m
+ from .models import *[m
+ from .serializers import *[m
+[31m-[m
+[32m+[m[32mimport random[m
+[32m+[m[32mimport string[m
+[32m+[m[32mfrom django.core.mail import send_mail[m
+ from restaurant.models import RestaurantData[m
+ from restaurant.serializers import RestaurantDataSerializer[m
+[31m-[m
+[32m+[m[32mfrom django.conf import settings[m
+ from django.core.serializers.json import DjangoJSONEncoder[m
+[32m+[m[32mfrom rest_framework.decorators import permission_classes[m
+[32m+[m[32mfrom rest_framework.permissions import IsAuthenticated[m
+ [m
+ def response(success, message):[m
+     return JsonResponse({"success": success, "message": message})[m
+[36m@@ -44,9 +48,8 @@[m [mdef adminlogin(request):[m
+         password = data_json.get("password")[m
+         try:[m
+             user=AdminData.objects.get(email=email)[m
+[31m-            print(user,user.email)[m
+[31m-            responsedata=AdminDataSerializer(user)[m
+             if check_password(password,user.password):[m
+[32m+[m[41m                [m
+                 payload={[m
+                     "id":user.id,[m
+                     "email":user.email,[m
+[36m@@ -67,6 +70,7 @@[m [mdef adminlogin(request):[m
+ def get_data(request):[m
+     # The user is authenticated, and you can access user data[m
+     user = request.user[m
+[32m+[m
+     jwt_token = request.headers.get("Authorization")[m
+ [m
+     if jwt_token:[m
+[36m@@ -90,15 +94,25 @@[m [mdef get_data(request):[m
+     [m
+ [m
+ @csrf_exempt[m
+[32m+[m[32m@permission_classes([IsAuthenticated])[m
+ def addrestaurant(request):[m
+     if request.method=="POST":[m
+         restaurantdata = json.loads(request.body)[m
+         serializer=RestaurantDataSerializer(data=restaurantdata)[m
+[32m+[m[41m      [m
+         if serializer.is_valid():[m
+[31m-            user= serializer.save()[m
+[31m-            print(user)[m
+[31m-            user.password=make_password(restaurantdata['password'])[m
+[31m-            user.save()[m
+[32m+[m[32m            random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))[m
+[32m+[m[32m            hased_password = make_password(random_password)[m
+[32m+[m[32m            serializer.validated_data['password'] = hased_password[m
+[32m+[m[32m            print(random_password,hased_password)[m
+[32m+[m[32m            user=serializer.save()[m
+[32m+[m[41m           [m
+[32m+[m[32m            subject = 'Creation of Account'[m
+[32m+[m[32m            message = f'Welcome {user.name},\nYour account has been created in FoodFuse. You can use your email: {user.email} and password:{random_password} for login. We encourage to change the password at first. Welcome to our team.'[m
+[32m+[m[32m            from_email = settings.EMAIL_HOST_USER[m
+[32m+[m[32m            recipient_list = [user.email][m
+[32m+[m[32m        # Send the email using Gmail[m
+[32m+[m[32m            send_mail(subject, message, from_email,recipient_list, fail_silently=True)[m
+             return response(True,"Restaurant added successfully")[m
+         else:[m
+             return response(False,serializer.errors)[m
+[1mdiff --git a/backend/restaurant/models.py b/backend/restaurant/models.py[m
+[1mindex c049148..3ef08e9 100644[m
+[1m--- a/backend/restaurant/models.py[m
+[1m+++ b/backend/restaurant/models.py[m
+[36m@@ -10,7 +10,8 @@[m [mclass RestaurantData(models.Model):[m
+     phonenumber=models.CharField(max_length=15)[m
+     delivery_time=models.CharField(max_length=5)[m
+     picture=models.ImageField(upload_to='restaurant/')[m
+[31m-[m
+[32m+[m[32m    description=models.TextField(max_length=500)[m
+[32m+[m[32m    open=models.BooleanField(default=True)[m
+     def __str__(self):[m
+         return self.name[m
+     [m
+[1mdiff --git a/backend/restaurant/serializers.py b/backend/restaurant/serializers.py[m
+[1mindex 795fbff..fa3a800 100644[m
+[1m--- a/backend/restaurant/serializers.py[m
+[1m+++ b/backend/restaurant/serializers.py[m
+[36m@@ -2,6 +2,10 @@[m [mfrom rest_framework import serializers[m
+ from .models import *[m
+ [m
+ class RestaurantDataSerializer(serializers.ModelSerializer):[m
+[32m+[m[32m    picture=serializers.ImageField(required=False)[m
+[32m+[m[32m    delivery_time=serializers.CharField(required=False)[m
+[32m+[m[32m    description=serializers.CharField(required=False)[m
+[32m+[m[32m    password=serializers.CharField(required=False)[m
+     class Meta:[m
+         model = RestaurantData[m
+         fields = '__all__'[m
+[36m@@ -10,7 +14,7 @@[m [mclass RestaurantDataSerializer(serializers.ModelSerializer):[m
+         data = super().to_representation(instance)[m
+         # Remove the 'password' field from the serialized data[m
+         data.pop('password', None)[m
+[31m-        return data[m
+[32m+[m[32m        return data[m[41m [m
+ [m
+ class TagSerializer(serializers.ModelSerializer):[m
+     class Meta:[m
+[1mdiff --git a/backend/restaurant/views.py b/backend/restaurant/views.py[m
+[1mindex 26bfc5b..dfc5371 100644[m
+[1m--- a/backend/restaurant/views.py[m
+[1m+++ b/backend/restaurant/views.py[m
+[36m@@ -65,4 +65,6 @@[m [mdef viewmenu(request):[m
+         except:[m
+             return  response( False , "No Menu found for this restaurant" )[m
+     else:[m
+[31m-        return response(False,"The method should be GET")[m
+\ No newline at end of file[m
+[32m+[m[32m        return response(False,"The method should be GET")[m
+[41m+    [m
+[41m+[m
+[1mdiff --git a/frontend/Admin/adminpanel/src/App.jsx b/frontend/Admin/adminpanel/src/App.jsx[m
+[1mindex fde1d68..3a35860 100644[m
+[1m--- a/frontend/Admin/adminpanel/src/App.jsx[m
+[1m+++ b/frontend/Admin/adminpanel/src/App.jsx[m
+[36m@@ -6,13 +6,18 @@[m [mimport { ColorModeContext, useMode } from "./Theme";[m
+ import "./App.css";[m
+ [m
+ // admin[m
+[31m-import Login from "./Components/AdminPages/Login.jsx";[m
+[32m+[m[32mimport AdminLogin from "./Components/AdminPages/Login.jsx";[m
+ import MenuBar from "./Components/global/MenuBar";[m
+ import Topbar from "./Components/global/Topbar";[m
+[31m-import Dashboard from "./Components/AdminPages/Dashboard.jsx";[m
+[32m+[m[32mimport AdminDashboard from "./Components/AdminPages/Dashboard.jsx";[m
+ import Restaurant from "./Components/AdminPages/Restaurant/Restaurant.jsx";[m
+ import Admin from "./Components/AdminPages/Admin/Admin.jsx";[m
+ [m
+[32m+[m[32m//restaurant[m
+[32m+[m[32mimport RestaurantLogin from "./Components/RestaurantPages/Login.jsx";[m
+[32m+[m[32mimport RestaurantDashboard from "./Components/RestaurantPages/Dashboard.jsx";[m
+[32m+[m[32mimport Menu from "./Components/RestaurantPages/Menu/Menu.jsx";[m
+[32m+[m
+ function App() {[m
+   const [theme, colorMode] = useMode();[m
+   const [isSidebar, setIsSidebar] = useState(true);[m
+[36m@@ -31,10 +36,14 @@[m [mfunction App() {[m
+               <Topbar setIsSidebar={setIsSidebar} />[m
+             )}[m
+             <Routes>[m
+[31m-              <Route path="/admin" element={<Login />} />[m
+[31m-              <Route path="/admin/dashboard" element={<Dashboard />} />[m
+[32m+[m[32m              <Route path="/admin" element={<AdminLogin />} />[m
+[32m+[m[32m              <Route path="/admin/dashboard" element={<AdminDashboard />} />[m
+               <Route path="/admin/restaurant" element={<Restaurant />} />[m
+               <Route path="/admin/admin" element={<Admin />} />[m
+[32m+[m
+[32m+[m[32m              <Route path="/restaurant" element={<RestaurantLogin />} />[m
+[32m+[m[32m              <Route path="/restaurant/dashboard" element={<RestaurantDashboard />}/>[m
+[32m+[m[32m              <Route path="/restaurant/menu" element={<Menu />} />[m
+             </Routes>[m
+           </main>[m
+         </div>[m
+[1mdiff --git a/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/AddRestaurant.jsx b/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/AddRestaurant.jsx[m
+[1mindex d64669a..deb84f1 100644[m
+[1m--- a/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/AddRestaurant.jsx[m
+[1m+++ b/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/AddRestaurant.jsx[m
+[36m@@ -12,7 +12,7 @@[m [mimport {[m
+ } from "@mui/material";[m
+ import { tokens } from "../../../Theme";[m
+ import styled from "@emotion/styled";[m
+[31m-[m
+[32m+[m[32mimport axios from "axios";[m
+ const CustomTextField = styled(TextField)({});[m
+ function AddRestaurant({ open, close, title, data }) {[m
+   const theme = useTheme();[m
+[36m@@ -24,14 +24,28 @@[m [mfunction AddRestaurant({ open, close, title, data }) {[m
+   const [email, setEmail] = useState("");[m
+ [m
+   const handleSubmit = () => {[m
+[31m-    alert("This will close");[m
+[31m-    close();[m
+[32m+[m[32m    data = {[m
+[32m+[m[32m      name: companyname,[m
+[32m+[m[32m      ownername: ownername,[m
+[32m+[m[32m      address: address,[m
+[32m+[m[32m      phonenumber: phone,[m
+[32m+[m[32m      email: email,[m
+[32m+[m[32m    };[m
+[32m+[m[32m    axios[m
+[32m+[m[32m      .post("http://127.0.0.1:8000/admin/addrestaurant/", data)[m
+[32m+[m[32m      .then((response) => {[m
+[32m+[m[32m        console.log(response.data);[m
+[32m+[m[32m        if (response.data["success"] === true) {[m
+[32m+[m[32m          alert("Restaurant added successfully");[m
+[32m+[m[32m          close();[m
+[32m+[m[32m        }[m
+[32m+[m[32m      });[m
+   };[m
+ [m
+   return ([m
+     <Dialog open={open} onClose={close} fullWidth>[m
+       <DialogTitle textAlign="center">[m
+[31m-        <Typography variant="h1">{title} </Typography>[m
+[32m+[m[32m        <Typography variant="h2">{title} </Typography>[m
+       </DialogTitle>[m
+       <DialogContent>[m
+         <Box[m
+[1mdiff --git a/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/Restaurant.jsx b/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/Restaurant.jsx[m
+[1mindex 76206da..4b8d010 100644[m
+[1m--- a/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/Restaurant.jsx[m
+[1m+++ b/frontend/Admin/adminpanel/src/Components/AdminPages/Restaurant/Restaurant.jsx[m
+[36m@@ -7,11 +7,12 @@[m [mimport SearchIcon from "@mui/icons-material/Search";[m
+ import IconButton from "@mui/material/IconButton";[m
+ import Button from "@mui/material/Button";[m
+ import Popup from "./AddRestaurant.jsx";[m
+[31m-import { useState } from "react";[m
+[32m+[m[32mimport { useEffect, useState } from "react";[m
+[32m+[m[32mimport axios from "axios";[m
+ const columns = [[m
+   { field: "id", headerName: "ID" },[m
+   {[m
+[31m-    field: "restaurant",[m
+[32m+[m[32m    field: "name",[m
+     headerName: "Restaurant  Name",[m
+     editable: true,[m
+   },[m
+[36m@@ -21,7 +22,7 @@[m [mconst columns = [[m
+     editable: true,[m
+   },[m
+   {[m
+[31m-    field: "phone",[m
+[32m+[m[32m    field: "phonenumber",[m
+     headerName: "Phone",[m
+     type: "number",[m
+     editable: true,[m
+[36m@@ -33,22 +34,23 @@[m [mconst columns = [[m
+     editable: true,[m
+   },[m
+   {[m
+[31m-    field: "ownerName",[m
+[32m+[m[32m    field: "ownername",[m
+     headerName: "Owner Name",[m
+     editable: true,[m
+   },[m
+ ];[m
+ [m
+[31m-const rows = [[m
+[31m-  {[m
+[31m-    id: 1,[m
+[31m-    restaurant: "foodhub by H2O",[m
+[31m-    address: "Jhochhen",[m
+[31m-    phone: "9841385218",[m
+[31m-    email: "foodhub@gmail.com",[m
+[31m-    ownerName: "John Doe",[m
+[31m-  },[m
+[31m-];[m
+[32m+[m[32m// const rows = [[m
+[32m+[m[32m//   {[m
+[32m+[m[32m//     id: 1,[m
+[32m+[m[32m//     restaurant: "foodhub by H2O",[m
+[32m+[m[32m//     address: "Jhochhen",[m
+[32m+[m[32m//     phone: "9841385218",[m
+[32m+[m[32m//     email: "foodhub@gmail.com",[m
+[32m+[m[32m//     ownerName: "John Doe",[m
+[32m+[m[32m//   },[m
+[32m+[m[32m// ];[m
+[32m+[m
+ const CssTextField = styled(TextField)({[m
+   "& label.Mui-focused": {[m
+     color: "#A0AAB4",[m
+[36m@@ -75,6 +77,20 @@[m [mconst Restaurant = () => {[m
+   const handleclose = () => {[m
+     setOpen(false);[m
+   };[m
+[32m+[m[32m  const [rows, setRows] = useState([]);[m
+[32m+[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    axios[m
+[32m+[m[32m      .get("http://127.0.0.1:8000/admin/viewrestaurant/")[m
+[32m+[m[32m      .then((response) => {[m
+[32m+[m[32m        // Handle the data from the backend[m
+[32m+[m[32m        console.log(response.data);[m
+[32m+[m[32m        setRows(response.data);[m
+[32m+[m[32m      })[m
+[32m+[m[32m      .catch((error) => {[m
+[32m+[m[32m        console.error("Error fetching data:", error);[m
+[32m+[m[32m      });[m
+[32m+[m[32m  }, []);[m
+ [m
+   return ([m
+     <Box ml={3} mr={5}>[m
+[1mdiff --git a/frontend/Admin/adminpanel/src/Components/RestaurantPages/Login.jsx b/frontend/Admin/adminpanel/src/Components/RestaurantPages/Login.jsx[m
+[1mindex c0e575e..82def63 100644[m
+[1m--- a/frontend/Admin/adminpanel/src/Components/RestaurantPages/Login.jsx[m
+[1m+++ b/frontend/Admin/adminpanel/src/Components/RestaurantPages/Login.jsx[m
+[36m@@ -32,10 +32,11 @@[m [mconst Login = () => {[m
+     password: password,[m
+   };[m
+   const HandleClick = () => {[m
+[31m-    // alert(`Email: ${email}\nPassword: ${password}`);[m
+[31m-    // alert(postdata);[m
+[31m-    const response = axios.post("http://127.0.0.1:8000/admin/", postdata);[m
+[31m-    console.log(response);[m
+[32m+[m[32m    axios[m
+[32m+[m[32m      .post("http://127.0.0.1:8000/restaurant/", postdata)[m
+[32m+[m[32m      .then((response) => {[m
+[32m+[m[32m        console.log(response.data);[m
+[32m+[m[32m      });[m
+   };[m
+ [m
+   return ([m
+[1mdiff --git a/frontend/Admin/adminpanel/src/Components/global/MenuBar.jsx b/frontend/Admin/adminpanel/src/Components/global/MenuBar.jsx[m
+[1mindex bdb6161..dcda489 100644[m
+[1m--- a/frontend/Admin/adminpanel/src/Components/global/MenuBar.jsx[m
+[1m+++ b/frontend/Admin/adminpanel/src/Components/global/MenuBar.jsx[m
+[36m@@ -98,8 +98,8 @@[m [mconst RestaurantItem = ({ isCollapsed, selected, setSelected }) => {[m
+         Data[m
+       </Typography>[m
+       <Item[m
+[31m-        title="Staff"[m
+[31m-        to="/restaurant/restaurant"[m
+[32m+[m[32m        title="Menu"[m
+[32m+[m[32m        to="/restaurant/menu"[m
+         icon={<RestaurantOutlinedIcon />}[m
+         selected={selected}[m
+         setSelected={setSelected}[m
+[36m@@ -140,8 +140,6 @@[m [mexport default function MenuBar() {[m
+           },[m
+         })[m
+         .then((response) => {[m
+[31m-          // Handle the data from the backend[m
+[31m-          console.log(response.data);[m
+           setName(response.data.message.name.toUpperCase());[m
+         })[m
+         .catch((error) => {[m
+[1mdiff --git a/frontend/Admin/adminpanel/src/Components/global/Topbar.jsx b/frontend/Admin/adminpanel/src/Components/global/Topbar.jsx[m
+[1mindex 6adc6e1..a4d3bbf 100644[m
+[1m--- a/frontend/Admin/adminpanel/src/Components/global/Topbar.jsx[m
+[1m+++ b/frontend/Admin/adminpanel/src/Components/global/Topbar.jsx[m
+[36m@@ -39,8 +39,6 @@[m [mconst Topbar = () => {[m
+           },[m
+         })[m
+         .then((response) => {[m
+[31m-          // Handle the data from the backend[m
+[31m-          console.log(response.data);[m
+           setName(response.data.message.name.toUpperCase());[m
+         })[m
+         .catch((error) => {[m
+[36m@@ -52,7 +50,7 @@[m [mconst Topbar = () => {[m
+   const handlelogout = () => {[m
+     sessionStorage.clear();[m
+     window.location.href = "/admin ";[m
+[31m-  }[m
+[32m+[m[32m  };[m
+   return ([m
+     <Box display="flex" justifyContent="right" m={3} mb={0}>[m
+       <IconButton onClick={colorMode.toggleColorMode} mr="4px">[m
+[36m@@ -107,9 +105,7 @@[m [mconst Topbar = () => {[m
+            

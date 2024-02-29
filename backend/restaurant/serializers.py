@@ -2,6 +2,10 @@ from rest_framework import serializers
 from .models import *
 
 class RestaurantDataSerializer(serializers.ModelSerializer):
+    picture=serializers.ImageField(required=False)
+    delivery_time=serializers.CharField(required=False)
+    description=serializers.CharField(required=False)
+    password=serializers.CharField(required=False)
     class Meta:
         model = RestaurantData
         fields = '__all__'
