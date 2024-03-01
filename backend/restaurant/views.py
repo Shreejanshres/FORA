@@ -66,3 +66,4 @@ def viewmenu(request):
             return  response( False , "No Menu found for this restaurant" )
     else:
         return response(False,"The method should be GET")
+    

@@ -103,7 +103,7 @@ def addrestaurant(request):
             print(random_password,hased_password)
             user=serializer.save()
             subject = 'Creation of Account'
-            message = f'Welcome {user.name},\nYour account has been created in FoodFuse. You can use your email: {user.email} and password:{random_password} for login. We encourage to change the password at first. Welcome to our team.'            
+            message = f'Welcome {user.ownername},\nYour account has been created in FoodFuse for {user.name}. You can use your email: {user.email} and password:{random_password} for login. We encourage to change the password at first. Welcome to our team.'            
             from_email = settings.EMAIL_HOST_USER
             recipient_list = [user.email]
         # Send the email using Gmail

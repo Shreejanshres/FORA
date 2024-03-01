@@ -6,9 +6,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Select,
   TextField,
   Typography,
   useTheme,
+  MenuItem,
 } from "@mui/material";
 import { tokens } from "../../../Theme";
 import styled from "@emotion/styled";
@@ -17,11 +19,11 @@ const CustomTextField = styled(TextField)({});
 function AddRestaurant({ open, close, title, data }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [companyname, setCompanyName] = useState("");
-  const [ownername, setOwneryName] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const [itemname, setItemName] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [tag, setTag] = useState("");
+  const [heading, setHeading] = useState("");
 
   const handleSubmit = () => {
     data = {
@@ -58,29 +60,35 @@ function AddRestaurant({ open, close, title, data }) {
           }}
         >
           <TextField
-            label="Restaurant Name"
+            label="Item Name"
             fullWidth
-            onChange={(e) => setCompanyName(e.target.value)}
+            onChange={(e) => setItemName(e.target.value)}
           />
           <TextField
-            label="Owner Name"
+            id="outlined-multiline-flexible"
+            label="Descrption"
+            multiline
+            maxRows={4}
             fullWidth
-            onChange={(e) => setOwneryName(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
           />
           <TextField
-            label="Location"
+            label="Price"
             fullWidth
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) => setPrice(e.target.value)}
           />
-          <TextField
-            label="Phone Number"
+          <Select
+            label="Tag"
             fullWidth
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <TextField
-            label="email"
+            onChange={(e) => setTag(e.target.value)}
+          >
+            <MenuItem value={"veg"}>Veg</MenuItem>
+            <MenuItem value={"non-veg"}>Non-Veg</MenuItem>
+          </Select>
+          <Select
+            label="Heading"
             fullWidth
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setHeading(e.target.value)}
           />
         </Box>
       </DialogContent>
