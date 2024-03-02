@@ -27,6 +27,7 @@ def login(request):
         return response(False,"The method should be POST")
     
 @csrf_exempt
+# only by admin
 def addtags(request):
     if request.method=="POST":
         data_json=json.loads(request.body)
@@ -38,6 +39,33 @@ def addtags(request):
             return  response(False,str(serializer.errors))
     else:
         return response(False,"The method should be POST")
+
+@csrf_exempt
+def add_heading(request):
+    if request.method == "POST":
+        data_json = json.loads(request.body)
+        serializer = HeadingSerializer(data=data_json, many=False)
+        if serializer.is_valid():
+            serializer.save()
+            return response(True, "Heading added successfully")
+        else:
+            return response(False, str(serializer.errors))
+    else:
+        return response(False, "The method should be POST")
+        
+@csrf_exempt
+def display_headings(request):
+    if request.method == "GET":
+        id = request.GET.get("id")
+        try:
+            # Assuming you have a Heading model and a HeadingSerializer
+            headings = Heading.objects.filter(restaurant=id)
+            serialized = HeadingSerializer(headings, many=True)
+            return JsonResponse(serialized.data, safe=False)
+        except:
+            return JsonResponse({"error": "No headings found for this restaurant"}, status=400)
+    else:
+        return JsonResponse({"error": "The method should be GET"}, status=400)
 
 @csrf_exempt
 def addmenu(request):
@@ -59,7 +87,7 @@ def viewmenu(request):
         id=data.get( "id" )
         tag=data.get("tag")
         try:
-            menuitem=Menu.objects.filter(restaurant=id)
+            menuitem=MenuItem.objects.filter(restaurant=id)
             serialized=MenuSerializer(menuitem,many=True)
             return  JsonResponse(serialized.data,safe=False)
         except:

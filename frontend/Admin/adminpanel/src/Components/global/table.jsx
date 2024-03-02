@@ -8,6 +8,9 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const table = ({ columns, data }) => {
   const theme = useTheme();
@@ -50,9 +53,48 @@ const table = ({ columns, data }) => {
                     {column.headerName}
                   </TableCell>
                 ))}
+                <TableCell
+                  sx={{
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? colors.blueAccent[400]
+                        : colors.blueAccent[500],
+                    color: "white",
+                  }}
+                >
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
+              {data.map((row, index) => (
+                <TableRow key={index}>
+                  {columns.map((column) => (
+                    <TableCell key={column.field}>
+                      {row[column.field]}
+                    </TableCell>
+                  ))}
+                  <TableCell>
+                    {/* Edit IconButton */}
+                    <IconButton
+                      sx={{ color: "green" }}
+                      onClick={() => onEdit(row.id)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    {/* Delete IconButton */}
+                    <IconButton
+                      sx={{ color: "red" }}
+                      onClick={() => onDelete(row.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+
+            {/* <TableBody>
               {data.map((row) => (
                 <TableRow key={row.id}>
                   {columns.map((column) => (
@@ -62,7 +104,7 @@ const table = ({ columns, data }) => {
                   ))}
                 </TableRow>
               ))}
-            </TableBody>
+            </TableBody> */}
           </Table>
         </TableContainer>
       </Paper>

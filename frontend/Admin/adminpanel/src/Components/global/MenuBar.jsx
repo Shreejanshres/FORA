@@ -48,7 +48,7 @@ const AdminItem = ({ isCollapsed, selected, setSelected }) => {
       <Divider />
       <Typography
         variant="h6"
-        color={colors.grey[300]}
+        color={colors.grey[100]}
         sx={{ m: "15px 0 5px 20px" }}
       >
         Data
@@ -92,7 +92,7 @@ const RestaurantItem = ({ isCollapsed, selected, setSelected }) => {
       <Divider />
       <Typography
         variant="h6"
-        color={colors.grey[300]}
+        color={colors.grey[100]}
         sx={{ m: "15px 0 5px 20px" }}
       >
         Data
@@ -127,7 +127,6 @@ export default function MenuBar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [name, setName] = useState("");
-  console.log(name);
   useEffect(() => {
     const token = localStorage.getItem("token");
     // Check if the token exists
@@ -188,7 +187,6 @@ export default function MenuBar() {
             icon: {
               "&:hover": {
                 backgroundColor: "red",
-                color: "yellow",
               },
             },
           }}
@@ -216,10 +214,10 @@ export default function MenuBar() {
         </MenuItem>
         {!isCollapsed && (
           <Box textAlign="center" display="grid" gap={2}>
-            <Typography variant="h2" fontWeight="bold">
+            <Typography variant="h2" fontWeight="bold" color={"white"}>
               Welcome back
             </Typography>
-            <Typography variant="h4" fontWeight={"bold"}>
+            <Typography variant="h4" fontWeight={"bold"} color={"white"}>
               {name}
             </Typography>
           </Box>

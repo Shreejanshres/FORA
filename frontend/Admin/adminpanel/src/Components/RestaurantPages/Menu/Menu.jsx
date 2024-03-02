@@ -2,13 +2,13 @@ import { Box, TextField, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../../Theme.jsx";
 import Table from "../../global/table.jsx";
 import { alpha, styled } from "@mui/material/styles";
-import InputAdornment from "@mui/material/InputAdornment";
-import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Popup from "./AddMenu.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import axios from "axios";
+import { Input } from "@mui/material";
 const columns = [
   { field: "id", headerName: "ID" },
   {
@@ -73,20 +73,80 @@ const Restaurant = () => {
     setOpen(false);
   };
   const [rows, setRows] = useState([]);
+  const [headings, setHeadings] = useState([]);
 
-  // useEffect(() => {
-  //   axios
-  //     .get("http://127.0.0.1:8000/admin/viewrestaurant/")
-  //     .then((response) => {
-  //       // Handle the data from the backend
-  //       console.log(response.data);
-  //       setRows(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error);
-  //     });
-  // }, []);
+  const [newHeading, setNewHeading] = useState("New Heading");
+  useLayoutEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/restaurant/display_headings/",
+          {
+            params: {
+              id: 1,
+            },
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setHeadings(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+  useEffect(() => {
+    if (headings.length > 0) {
+      allmenuitems();
+    }
+  }, [headings]);
+  const allmenuitems = () => {
+    const newRows = [];
+    headings.forEach((heading) => {
+      heading.menuitem_set.forEach((menuitem) => {
+        newRows.push({
+          heading_id: heading.id,
+          tag: heading.heading_name,
+          id: menuitem.id,
+          name: menuitem.item_name,
+          price: menuitem.price,
+        });
+      });
+    });
+    setRows(newRows);
+  };
 
+  const heading_item = (index) => {
+    const newRows = [];
+    headings[index].menuitem_set.forEach((menuitem) => {
+      newRows.push({
+        heading_id: headings[index].id,
+        tag: headings[index].heading_name,
+        id: menuitem.id,
+        name: menuitem.item_name,
+        price: menuitem.price,
+      });
+    });
+    setRows(newRows);
+  };
+
+  const sendHeadingToBackend = async (heading) => {
+    try {
+      // Make an API call to add the new heading to the backend
+      const response = await axios.post(
+        "http://127.0.0.1:8000/restaurant/add_heading/",
+        {
+          userId: 1,
+          heading,
+        }
+      );
+      console.log(response.data); // Handle the response from the backend as needed
+    } catch (error) {
+      console.error("Error adding heading to backend:", error);
+    }
+  };
   return (
     <Box ml={3} mr={5}>
       <Box>
@@ -98,36 +158,67 @@ const Restaurant = () => {
         sx={{
           // border: "2px solid red",
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "space-arournd",
+          gap: "10px",
+          backgroundColor: alpha(colors.blueAccent[700], 0.5),
+          height: "50px",
         }}
       >
-        <CssTextField
-          label="Search"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton edge="end">
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
         <Button
-          variant="outlined"
+          variant="text"
           sx={{
-            borderRadius: 3,
-            borderColor: colors.greenAccent[500],
-            color: colors.grey[100],
+            color: "white",
+            fontSize: "15px",
+            fontWeight: "bold",
+            ":hover": {
+              backgroundColor: colors.greenAccent[800],
+              color: colors.grey[100],
+            },
+          }}
+          onClick={() => allmenuitems()}
+        >
+          All
+        </Button>
+        {headings.map((heading, index) => (
+          <Button
+            key={index}
+            variant="text"
+            sx={{
+              color: "white",
+              fontSize: "15px",
+              fontWeight: "bold",
+              ":hover": {
+                backgroundColor: colors.greenAccent[800],
+                color: colors.grey[100],
+              },
+            }}
+            onClick={() => heading_item(index)}
+          >
+            {heading.heading_name}
+          </Button>
+        ))}
+        {open && (
+          <Input
+            aria-label="New Heading"
+            onInput={(e) => setNewHeading(e.currentTarget.textContent)}
+          />
+        )}
+        <IconButton
+          size="large"
+          sx={{
+            backgroundColor: colors.blueAccent[500],
+            margin: "5px 0px 5px 0px",
+            color: "white",
             ":hover": {
               backgroundColor: colors.greenAccent[800],
             },
           }}
           onClick={() => setOpen(!open)}
         >
-          Add Menu
-        </Button>
-        <Popup open={open} close={handleclose} title="Add Menu" />
+          <AddIcon />
+        </IconButton>
+
+        {/* <Popup open={open} close={handleclose} title="Add Menu" /> */}
       </Box>
       <Box m="20px 0 0 0">
         <Table columns={columns} data={rows} />
@@ -136,3 +227,4 @@ const Restaurant = () => {
   );
 };
 export default Restaurant;
+// onClick={() => setOpen(!open)}
