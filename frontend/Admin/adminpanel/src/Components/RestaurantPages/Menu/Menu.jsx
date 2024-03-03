@@ -1,6 +1,6 @@
 import { Box, TextField, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../../Theme.jsx";
-import Table from "../../global/table.jsx";
+import Table from "./menutable.jsx";
 import { alpha, styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
@@ -9,6 +9,7 @@ import Popup from "./AddMenu.jsx";
 import { useEffect, useLayoutEffect, useState } from "react";
 import axios from "axios";
 import { Input } from "@mui/material";
+import DoneIcon from "@mui/icons-material/Done";
 const columns = [
   { field: "id", headerName: "ID" },
   {
@@ -67,15 +68,12 @@ const CssTextField = styled(TextField)({
 const Restaurant = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
   const [open, setOpen] = useState(false);
-  const handleclose = () => {
-    setOpen(false);
-  };
+  const [headingopen, setHeadingOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [headings, setHeadings] = useState([]);
-
   const [newHeading, setNewHeading] = useState("New Heading");
+
   useLayoutEffect(() => {
     const fetchData = async () => {
       try {
@@ -90,18 +88,34 @@ const Restaurant = () => {
             },
           }
         );
-        setHeadings(response.data);
+        localStorage.setItem("headingdata", response.data.token);
+        setHeadings(response.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-    fetchData();
+
+    if (localStorage.getItem("headingdata") === null) {
+      // If data is not in localStorage, fetch and store it
+      fetchData();
+    } else {
+      // If data is already in localStorage, decode the token and use it
+      const token = localStorage.getItem("headingdata");
+      const data = JSON.parse(atob(token.split(".")[1]));
+      setHeadings(data.data);
+    }
   }, []);
   useEffect(() => {
     if (headings.length > 0) {
       allmenuitems();
     }
   }, [headings]);
+  const handleclose = () => {
+    setOpen(false);
+  };
+  const handleopen = () => {
+    setOpen(!open);
+  };
   const allmenuitems = () => {
     const newRows = [];
     headings.forEach((heading) => {
@@ -133,16 +147,18 @@ const Restaurant = () => {
   };
 
   const sendHeadingToBackend = async (heading) => {
+    const data = {
+      heading_name: heading,
+      restaurant: 1,
+    };
     try {
       // Make an API call to add the new heading to the backend
       const response = await axios.post(
         "http://127.0.0.1:8000/restaurant/add_heading/",
-        {
-          userId: 1,
-          heading,
-        }
+        data
       );
-      console.log(response.data); // Handle the response from the backend as needed
+      localStorage.removeItem("headingdata");
+      window.location.reload();
     } catch (error) {
       console.error("Error adding heading to backend:", error);
     }
@@ -160,8 +176,12 @@ const Restaurant = () => {
           display: "flex",
           justifyContent: "space-arournd",
           gap: "10px",
-          backgroundColor: alpha(colors.blueAccent[700], 0.5),
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? alpha(colors.blueAccent[600], 0.5)
+              : alpha(colors.blueAccent[400], 0.5),
           height: "50px",
+          borderRadius: "10px",
         }}
       >
         <Button
@@ -172,6 +192,10 @@ const Restaurant = () => {
             fontWeight: "bold",
             ":hover": {
               backgroundColor: colors.greenAccent[800],
+              color: colors.grey[100],
+            },
+            ":after": {
+              backgroundColor: colors.redAccent[800],
               color: colors.grey[100],
             },
           }}
@@ -197,10 +221,27 @@ const Restaurant = () => {
             {heading.heading_name}
           </Button>
         ))}
-        {open && (
+        {headingopen && (
           <Input
             aria-label="New Heading"
-            onInput={(e) => setNewHeading(e.currentTarget.textContent)}
+            onChange={(e) => setNewHeading(e.target.value)}
+            endAdornment={
+              <IconButton
+                onClick={() => {
+                  console.log(newHeading);
+                  sendHeadingToBackend(newHeading);
+                }}
+                size="small"
+                sx={{
+                  background: colors.greenAccent[700],
+                  ":hover": {
+                    background: colors.greenAccent[600],
+                  },
+                }}
+              >
+                <DoneIcon />
+              </IconButton>
+            }
           />
         )}
         <IconButton
@@ -213,18 +254,18 @@ const Restaurant = () => {
               backgroundColor: colors.greenAccent[800],
             },
           }}
-          onClick={() => setOpen(!open)}
+          onClick={() => setHeadingOpen(!headingopen)}
         >
           <AddIcon />
         </IconButton>
 
-        {/* <Popup open={open} close={handleclose} title="Add Menu" /> */}
+        <Popup open={open} close={handleclose} title="Add Menu" />
       </Box>
       <Box m="20px 0 0 0">
-        <Table columns={columns} data={rows} />
+        <Table columns={columns} data={rows} onClick={handleopen} />
       </Box>
     </Box>
   );
 };
 export default Restaurant;
-// onClick={() => setOpen(!open)}
+// onClick={() => }

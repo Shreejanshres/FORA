@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 import json
 from django.contrib.auth.hashers import make_password, check_password
-
+import jwt
 from .models import *
 from .serializers import *
 def response(success, message):
@@ -44,6 +44,7 @@ def addtags(request):
 def add_heading(request):
     if request.method == "POST":
         data_json = json.loads(request.body)
+        print(data_json)
         serializer = HeadingSerializer(data=data_json, many=False)
         if serializer.is_valid():
             serializer.save()
@@ -61,7 +62,10 @@ def display_headings(request):
             # Assuming you have a Heading model and a HeadingSerializer
             headings = Heading.objects.filter(restaurant=id)
             serialized = HeadingSerializer(headings, many=True)
-            return JsonResponse(serialized.data, safe=False)
+            payload = {"data": serialized.data}
+            token = jwt.encode(payload,"heading",algorithm="HS256")
+            payload = {"data": serialized.data, "token": token}
+            return JsonResponse(payload, safe=False)
         except:
             return JsonResponse({"error": "No headings found for this restaurant"}, status=400)
     else:
