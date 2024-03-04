@@ -1,9 +1,13 @@
 from rest_framework import serializers
 from .models import *
 
-class AdminDataSerializer(serializers.ModelSerializer):
+class AdminUserSerializer(serializers.ModelSerializer):
+    picture = serializers.ImageField(required=False)
+    username = serializers.CharField(required=False)
+    groups = serializers.CharField(required=False)
+    user_permissions = serializers.CharField(required=False)
     class Meta:
-        model = AdminData
+        model = AdminUser
         fields = '__all__'
 
     def to_representation(self, instance):

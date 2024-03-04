@@ -11,7 +11,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 // import axios from "axios";
 import InputBase from "@mui/material/InputBase";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -30,26 +29,14 @@ const Topbar = () => {
     const token = localStorage.getItem("token");
     // Check if the token exists
     if (token) {
-      // Send the token to the backend for data retrieval
-      axios
-        .get("http://127.0.0.1:8000/admin/getdata/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          // Handle the data from the backend
-          console.log(response.data);
-          setName(response.data.message.name.toUpperCase());
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
+      const data = JSON.parse(atob(token.split(".")[1]));
+      setName(data.name);
     }
   }, []);
 
   const handlelogout = () => {
-    sessionStorage.clear();
+    localStorage.clear();
+
     if (window.location.pathname.includes("/admin")) {
       window.location.href = "/admin";
     } else {
@@ -75,6 +62,7 @@ const Topbar = () => {
       <FormControl variant="standard" value={name}>
         <Select
           value={name}
+          onChange={(e) => setName(e.target.value)}
           sx={{
             backgroundColor: { color: colors.primary[100] },
             width: "160px",

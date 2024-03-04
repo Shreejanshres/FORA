@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 import json
 from django.contrib.auth.hashers import make_password, check_password
 import jwt
+from django.core.serializers.json import DjangoJSONEncoder
 from .models import *
 from .serializers import *
 def response(success, message):
@@ -16,9 +17,12 @@ def login(request):
         email= data_json.get("email")
         password = data_json.get("password")
         try:
-            user=RestaurantData.objects.get(email=email)
+            user=RestaurantUser.objects.get(email=email)
             if check_password(password,user.password):
-                 return response(True,"Logged in successfully")
+                serialized=RestaurantUserSerializer(user,many=False)
+                payload = {"data": serialized.data}
+                token = jwt.encode(payload, "secret", algorithm="HS256")
+                return JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
             else :  
                 return response(False,"password doesn't match")
         except:

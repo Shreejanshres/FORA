@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['192.168.1.66','127.0.0.1','192.168.1.103']
 INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'user.apps.UserConfig', 
     'restaurant.apps.RestaurantConfig',
     'admins.apps.AdminsConfig', 
@@ -158,7 +159,6 @@ EMAIL_USE_SSL = False
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, '../Client/build/static')
 # ]
-
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',

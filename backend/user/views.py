@@ -25,7 +25,7 @@ import random
 def signup(request):
     if request.method == "POST":
         data_json = json.loads(request.body)
-        serializer = UserDataSerializer(data=data_json)
+        serializer = CustomerUserSerializer(data=data_json)
         
         if serializer.is_valid():
             user = serializer.save()
@@ -49,8 +49,8 @@ def login(request):
         password = data_json.get("password")
         print(email,password)
         try:
-            user=UserData.objects.get(email=email)
-            responsedata=UserDataSerializer(user)
+            user=CustomerUser.objects.get(email=email)
+            responsedata=CustomerUserSerializer(user)
            
             if check_password(password,user.password):
                 return JsonResponse({"success":True,"message":responsedata.data},encoder=DjangoJSONEncoder)
@@ -73,7 +73,7 @@ def forgetpassword(request):
             # User has exceeded the limit for OTP requests within 5 minutes
             return JsonResponse({"success": False, "message": "Exceeded the limit for OTP requests. Try again later."})
         else:
-            if UserData.objects.filter(email=email).exists() :
+            if CustomerUser.objects.filter(email=email).exists() :
                 OtpLog.objects.filter(email=email, is_active=True).update(is_active=False)
                 otp = str(random.randint(100000, 999999))
                 # Compose the email message
@@ -106,8 +106,8 @@ def updatepassword(request):
         data=json.loads(request.body)
         password=data.get('newpassword')
         email=data.get('email')
-        if(UserData.objects.filter(email=email).exists):
-            data = UserData.objects.get(email=email)
+        if(CustomerUser.objects.filter(email=email).exists):
+            data = CustomerUser.objects.get(email=email)
             data.password = password
             data.save()
             return JsonResponse({'success': True, 'message': 'Password changed successfully'})

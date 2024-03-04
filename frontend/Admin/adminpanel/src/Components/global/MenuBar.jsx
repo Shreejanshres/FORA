@@ -10,10 +10,11 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { Link } from "react-router-dom";
-
+import Cookie from "js-cookie";
 import { tokens } from "../../Theme";
 import { useEffect } from "react";
 import axios from "axios";
+// import { Cookie } from "@mui/icons-material";
 const isAdminPath = window.location.pathname.includes("/admin");
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -129,23 +130,9 @@ export default function MenuBar() {
   const [name, setName] = useState("");
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // Check if the token exists
     if (token) {
-      // Send the token to the backend for data retrieval
-      axios
-        .get("http://127.0.0.1:8000/admin/getdata/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          // Handle the data from the backend
-          console.log(response.data);
-          setName(response.data.message.name.toUpperCase());
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
+      const data = JSON.parse(atob(token.split(".")[1]));
+      setName(data.data.ownername);
     }
   }, []);
   return (

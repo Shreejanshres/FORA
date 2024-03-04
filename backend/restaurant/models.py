@@ -1,7 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 # Create your models here.    
-class RestaurantData(AbstractUser):
+class RestaurantUser(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     password=models.CharField(max_length=255)
@@ -25,7 +24,7 @@ class Tags(models.Model):
 
 class Heading(models.Model):
     heading_name = models.CharField(max_length=255)
-    restaurant = models.ForeignKey(RestaurantData, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(RestaurantUser, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"{self.restaurant.name} - {self.heading_name}"

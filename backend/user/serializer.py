@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from .models import *
 
-class UserDataSerializer(serializers.ModelSerializer):
+class CustomerUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserData
+        model = CustomerUser
         fields = '__all__'
     
     def to_representation(self, instance):

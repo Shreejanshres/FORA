@@ -2,17 +2,13 @@ import { Box, Grid, Icon, Typography, useTheme } from "@mui/material";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import PeopleIcon from "@mui/icons-material/People";
-import { jwtDecode } from "jwt-decode";
 import { tokens } from "../../Theme";
 import React, { useEffect } from "react";
-import axios from "axios";
+
 
 const Data = ({ title, value, icon: IconComponent }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
- 
-
   return (
     <Box
       display="flex"

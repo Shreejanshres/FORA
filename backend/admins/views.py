@@ -1,19 +1,20 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import jwt
-from rest_framework.decorators import api_view
 import json
 from django.contrib.auth.hashers import make_password, check_password
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from rest_framework.authtoken.models import Token
+
+from rest_framework.authtoken.models import Token
 from .models import *
 from .serializers import *
 import random
 import string
 from django.core.mail import send_mail
 from django.conf import settings
-from restaurant.models import RestaurantData
-from restaurant.serializers import RestaurantDataSerializer
-
+from restaurant.models import RestaurantUser
+from restaurant.serializers import RestaurantUserSerializer
 from django.core.serializers.json import DjangoJSONEncoder
 
 def response(success, message):
@@ -25,7 +26,7 @@ def response(success, message):
 def adminsignup(request):
     if request.method == "POST":
         data_json = json.loads(request.body)
-        serializer = AdminDataSerializer(data=data_json)
+        serializer = AdminUserSerializer(data=data_json)
         if serializer.is_valid():
             user = serializer.save()
             print(user)
@@ -46,16 +47,10 @@ def adminlogin(request):
         email= data_json.get("email")
         password = data_json.get("password")
         try:
-            user=AdminData.objects.get(email=email)
-
+            user=AdminUser.objects.get(email=email)
             if check_password(password,user.password):
-                payload={
-                    "id":user.id,
-                    "email":user.email,
-                    "name":user.name,
-                    "phone":user.phonenumber,
-                    "address":user.address,
-                }
+                serialized=AdminUserSerializer(user,many=False)
+                payload = {"data": serialized.data}
                 token = jwt.encode(payload, "secret", algorithm="HS256")
                 return JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
             else :  
@@ -65,29 +60,8 @@ def adminlogin(request):
     else:
         return response(False,"The method should be POST")
 
-@csrf_exempt
-def get_data(request):
-    # The user is authenticated, and you can access user data
-    user = request.user
-    jwt_token = request.headers.get("Authorization")
 
-    if jwt_token:
-        try:
-           
-            payload = jwt.decode(jwt_token.split(" ")[1], "secret", algorithms=["HS256"])
-            user = AdminData.objects.get(id=payload["id"])
-            data = {
-                "id": user.id,
-                "email": user.email,
-                "name": user.name,
-                "address": user.address,
-                "phone": user.phonenumber,
 
-            }
-            return response(True,data)
-        except:
-            return response(False,"Token has expired")
- 
 
     
 
@@ -95,7 +69,7 @@ def get_data(request):
 def addrestaurant(request):
     if request.method=="POST":
         restaurantdata = json.loads(request.body)
-        serializer=RestaurantDataSerializer(data=restaurantdata)
+        serializer=RestaurantUserSerializer(data=restaurantdata)
         if serializer.is_valid():
             random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
             hased_password = make_password(random_password)           
@@ -118,10 +92,11 @@ def addrestaurant(request):
 @csrf_exempt
 def getrestaurantdata(request):
     if request.method=="GET":
-        alldata= RestaurantData.objects.all()
-        serialized_data = RestaurantDataSerializer(alldata,many=True)
+        data= request.body
+        print(data)
+        alldata= RestaurantUser.objects.all()
+        serialized_data = RestaurantUserSerializer(alldata,many=True)
         return JsonResponse(serialized_data.data,safe=False)
-        # return  JsonResponse(RestaurantDataviews.as_view()(request))
     else:
         return response(False,"The method should be GET")
     

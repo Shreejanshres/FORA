@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { tokens } from "../../Theme";
 import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -42,12 +43,12 @@ const Login = () => {
         "http://127.0.0.1:8000/admin/",
         postdata
       );
-      const { message } = response.data;
-      console.log(message);
-      const decoded = jwtDecode(message);
-      console.log(decoded);
-      localStorage.setItem("token", message);
-      navigate("/admin/dashboard");
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.message);
+        navigate("/admin/dashboard");
+      } else {
+        alert(response.data.message);
+      }
     } catch (error) {
       console.error("Error:", error);
       // Handle the error, e.g., show an error message to the user
