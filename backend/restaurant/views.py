@@ -63,7 +63,7 @@ def display_headings(request):
     if request.method == "GET":
         data = json.loads(request.body)
         id = data.get("id")
-        print(id)
+        print(data)
         try:
             # Assuming you have a Heading model and a HeadingSerializer
             headings = Heading.objects.filter(restaurant=id)

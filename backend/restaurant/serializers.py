@@ -3,6 +3,7 @@ from .models import *
 
 class RestaurantUserSerializer(serializers.ModelSerializer):
     picture=serializers.ImageField(required=False)
+    coverphoto=serializers.ImageField(required=False)
     delivery_time=serializers.CharField(required=False)
     description=serializers.CharField(required=False)
     password=serializers.CharField(required=False)

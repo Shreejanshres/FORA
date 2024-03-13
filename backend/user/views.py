@@ -131,3 +131,187 @@ def validate_otp(request):
 
     else:
         return JsonResponse({"success":False, "message":"The request should be POST"})
+    
+
+
+#recipe code
+@csrf_exempt
+def add_recipe(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = CustomerUser.objects.get(id=data.get('user'))
+        recipe = Recipe.objects.create(
+            title=data.get('title'),
+            description=data.get('description'),
+            image=data.get('image'),
+            time=data.get('time'),
+            ingredients=data.get('ingredients'),
+            directions=data.get('directions'),
+            user=user
+        )
+        return JsonResponse({"success":True,"message":"Recipe added successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be POST"})
+
+@csrf_exempt
+def get_recipe(request):
+    if request.method == 'GET':
+        recipes = Recipe.objects.all()
+        serializer = RecipeSerializer(recipes, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+@csrf_exempt
+def delete_recipe(request, id):
+    if request.method == 'DELETE':
+        recipe = Recipe.objects.get(id=id)
+        recipe.delete()
+        return JsonResponse({"success":True,"message":"Recipe deleted successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be DELETE"})
+
+@csrf_exempt
+def get_recipe_by_id(request, id):
+    if request.method == 'GET':
+        recipe = Recipe.objects.get(id=id)
+        serializer = RecipeSerializer(recipe)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+#post code
+@csrf_exempt
+def add_post(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = CustomerUser.objects.get(id=data.get('user'))
+        post = Post.objects.create(
+            image=data.get('image'),
+            caption=data.get('caption'),
+            user=user
+        )
+        return JsonResponse({"success":True,"message":"Post added successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be POST"})
+
+@csrf_exempt
+def get_post_with_comments_and_likes(request):
+    if request.method == 'GET':
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True)
+        data = serializer.data
+        return JsonResponse({"success": True, "message": data})
+    else:
+        return JsonResponse({"success": False, "message": "The request should be GET"})
+
+@csrf_exempt
+def delete_post(request, id):
+    if request.method == 'DELETE':
+        post = Post.objects.get(id=id)
+        post.delete()
+        return JsonResponse({"success":True,"message":"Post deleted successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be DELETE"})
+
+
+#comment code
+@csrf_exempt
+def add_comment(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = CustomerUser.objects.get(id=data.get('user'))
+        post = Post.objects.get(id=data.get('post'))
+        comment = Comment.objects.create(
+            text=data.get('text'),
+            user=user,
+            post=post
+        )
+        return JsonResponse({"success":True,"message":"Comment added successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be POST"})
+
+@csrf_exempt
+def get_comment(request):
+    if request.method == 'GET':
+        comments = Comment.objects.all()
+        serializer = CommentSerializer(comments, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+@csrf_exempt
+def delete_comment(request, id):
+    if request.method == 'DELETE':
+        comment = Comment.objects.get(id=id)
+        comment.delete()
+        return JsonResponse({"success":True,"message":"Comment deleted successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be DELETE"})
+
+#like code
+@csrf_exempt
+def add_like(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = CustomerUser.objects.get(id=data.get('user'))
+        post = Post.objects.get(id=data.get('post'))
+        like = Like.objects.create(
+            user=user,
+            post=post
+        )
+        return JsonResponse({"success":True,"message":"Like added successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be POST"})
+
+@csrf_exempt
+def get_like(request):
+    if request.method == 'GET':
+        likes = Like.objects.all()
+        serializer = LikeSerializer(likes, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+@csrf_exempt
+def delete_like(request, id):
+    if request.method == 'DELETE':
+        like = Like.objects.get(id=id)
+        like.delete()
+        return JsonResponse({"success":True,"message":"Like deleted successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be DELETE"})
+
+#follow code
+@csrf_exempt
+def add_follow(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        follower = CustomerUser.objects.get(id=data.get('follower'))
+        following = CustomerUser.objects.get(id=data.get('following'))
+        follow = Follow.objects.create(
+            follower=follower,
+            following=following
+        )
+        return JsonResponse({"success":True,"message":"Follow added successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be POST"})
+
+@csrf_exempt
+def get_follow(request):
+    if request.method == 'GET':
+        follows = Follow.objects.all()
+        serializer = FollowSerializer(follows, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+@csrf_exempt
+def delete_follow(request, id):
+    if request.method == 'DELETE':
+        follow = Follow.objects.get(id=id)
+        follow.delete()
+        return JsonResponse({"success":True,"message":"Follow deleted successfully"})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be DELETE"})
+    

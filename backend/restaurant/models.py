@@ -9,6 +9,7 @@ class RestaurantUser(models.Model):
     phonenumber=models.CharField(max_length=15)
     delivery_time=models.CharField(max_length=5)
     picture=models.ImageField(upload_to='images/')
+    coverphoto=models.ImageField(upload_to='coverphotos/')
     description=models.TextField(max_length=500)
     open=models.BooleanField(default=True)
     def __str__(self):
