@@ -19,6 +19,8 @@ class OtpLogSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
+    username = serializers.CharField(source='user.name', read_only=True)
+    profile_pic = serializers.ImageField(source='user.profile_pic', read_only=True)
     class Meta:
         model=Recipe
         fields = '__all__'
