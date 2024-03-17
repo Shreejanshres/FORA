@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
-
+import  dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-!+iin1@2&nw-fr8a@3h2d#eqsb$mseyy#=c-wq77w=g@0i&2x9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.66','127.0.0.1','192.168.1.103']
+ALLOWED_HOSTS = ['192.168.1.66','127.0.0.1','192.168.56.1','10.22.19.46',]
 
 
 # Application definition
@@ -107,7 +107,10 @@ DATABASES = {
         'HOST': 'localhost',
     }
 }
-
+# render
+DATABASES = {
+    'default':dj_database_url.parse(os.environ.get('DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -187,3 +190,4 @@ CORS_ALLOW_CREDENTIALS = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+

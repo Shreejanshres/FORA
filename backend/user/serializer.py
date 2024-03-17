@@ -40,12 +40,15 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['id', 'username' , 'created_at'] 
 
 class PostSerializer(serializers.ModelSerializer):
-    comments=CommentSerializer(many=True, read_only=True)
-    likes=LikeSerializer(many=True, read_only=True)
-    image = serializers.ImageField(required=False)  
+    likes_count = serializers.SerializerMethodField()
+    image = serializers.ImageField(required=False) 
+    username = serializers.CharField(source='user.name', read_only=True)
+    cprofile_pic = serializers.ImageField(source='user.profile_pic', read_only=True)
     class Meta:
         model=Post
         fields = '__all__'
+    def get_likes_count(self, obj):
+        return obj.likes.count()
 
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:
