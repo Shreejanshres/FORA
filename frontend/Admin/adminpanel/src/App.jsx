@@ -20,7 +20,8 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
   const location = useLocation();
   const adminLoginPage = location.pathname === "/admin";
-  const restaurantLoginPage = location.pathname === "/restaurant";
+  const restaurantLoginPage = 
+  .pathname === "/restaurant";
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -37,7 +38,6 @@ function App() {
               <Route path="/admin/dashboard" element={<Admindashboard />} />
               <Route path="/admin/restaurant" element={<Restaurant />} />
               <Route path="/admin/admin" element={<Admin />} />
-              
               <Route path="/restaurant" element={<Restaurantlogin />} />
               <Route path="/restaurant/dashboard" element={<Restaurantdashboard />} />
               <Route path="/restaurant/menu" element={<Restaurantmenu />} />

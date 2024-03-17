@@ -162,6 +162,8 @@ def get_recipe(request):
     else:
         return JsonResponse({"success":False,"message":"The request should be GET"})
 
+
+
 @csrf_exempt
 def delete_recipe(request, id):
     if request.method == 'DELETE':
