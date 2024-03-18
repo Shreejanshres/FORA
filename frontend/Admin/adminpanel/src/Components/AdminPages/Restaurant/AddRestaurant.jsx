@@ -32,7 +32,7 @@ function AddRestaurant({ open, close, title, data }) {
       email: email,
     };
     axios
-      .post("http://127.0.0.1:8000/admin/addrestaurant/", data)
+      .post("http://fora-1.onrender.com/admin/addrestaurant/", data)
       .then((response) => {
         console.log(response.data);
         if (response.data["success"] === true) {
