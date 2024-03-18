@@ -186,6 +186,7 @@ CELERY_RESULT_BACKEND='django-db'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost",
     'fora-1.onrender.com',
      "*", # Replace with the origin of your frontend
 ]
