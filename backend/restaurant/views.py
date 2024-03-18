@@ -61,9 +61,8 @@ def add_heading(request):
 @csrf_exempt
 def display_headings(request):
     if request.method == "GET":
-        data = json.loads(request.body)
-        id = data.get("id")
-        print(data)
+        id = request.get("id")
+        print(id)
         try:
             # Assuming you have a Heading model and a HeadingSerializer
             headings = Heading.objects.filter(restaurant=id)
