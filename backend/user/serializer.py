@@ -43,6 +43,7 @@ class PostSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     image = serializers.ImageField(required=False) 
     username = serializers.CharField(source='user.name', read_only=True)
+    comment= CommentSerializer(many=True, read_only=True)
     profile_pic = serializers.ImageField(source='user.profile_pic', read_only=True)
     class Meta:
         model=Post
