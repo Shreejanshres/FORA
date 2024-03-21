@@ -33,7 +33,6 @@ def signup(request):
             # Hash the password before saving to the database
             user.password = make_password(data_json['password'])
             user.save()
-            
             return JsonResponse({"success":True,"message": "Signup successful"})
         else:
             # If the data is not valid, return the errors
@@ -234,9 +233,9 @@ def add_comment(request):
         return JsonResponse({"success":False,"message":"The request should be POST"})
 
 @csrf_exempt
-def get_comment(request):
+def get_comment(request,id):
     if request.method == 'GET':
-        comments = Comment.objects.all()
+        comments = Comment.objects.filter(post=id).all()
         serializer = CommentSerializer(comments, many=True)
         return JsonResponse({"success":True,"message":serializer.data})
     else:

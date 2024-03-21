@@ -43,6 +43,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   transparent_image: ^2.0.1
   timeago: ^3.6.1
+  provider: ^6.1.2
 
 
 dev_dependencies:
