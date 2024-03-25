@@ -97,4 +97,3 @@ def getrestaurantdata(request):
         return JsonResponse(serialized_data.data,safe=False)
     else:
         return response(False,"The method should be GET")
-    

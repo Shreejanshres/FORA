@@ -1,5 +1,6 @@
 from django.db import models
 # Create your models here.    
+from user.models import CustomerUser
 class RestaurantUser(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -40,4 +41,23 @@ class MenuItem(models.Model):
     def __str__(self):
         return f"{self.item_name} - {self.price}"
     
-    
+
+class CartTable(models.Model):
+    user_id= models.OneToOneField(CustomerUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Cart for {self.user_id.name}"
+
+class Cartitem(models.Model):
+    cart= models.ForeignKey(CartTable,related_name="cart_item", on_delete=models.CASCADE)
+    item= models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    quantity= models.IntegerField()
+    notes= models.TextField(null=True, blank=True)
+    restaurant= models.ForeignKey(RestaurantUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.item.item_name} in {self.cart}"

@@ -26,7 +26,7 @@ class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model=MenuItem
         fields='__all__'
-        extra_kwargs = {'picture': {'required': False}}
+        
 
 class HeadingSerializer(serializers.ModelSerializer):
     menuitem_set = MenuSerializer(many=True, read_only=True)
@@ -34,3 +34,35 @@ class HeadingSerializer(serializers.ModelSerializer):
         model=Heading
         fields='__all__'
         extra_kwargs = {'restaurant': {'required': False}}
+
+class DetailDataSerializer(serializers.ModelSerializer):
+    heading_set= HeadingSerializer(many=True, read_only=True)
+    class Meta:
+        model=RestaurantUser
+        fields='__all__'
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Remove the 'password' field from the serialized data
+        data.pop('password', None)
+        return data
+
+class AddCartItemSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model=Cartitem
+        fields='__all__'
+
+class CartItemSerializer(serializers.ModelSerializer):
+    item=MenuSerializer(many=False, read_only=True)
+    class Meta:
+        model=Cartitem
+        fields='__all__'
+
+    
+class CartTableSerializer(serializers.ModelSerializer):
+    cart_item=CartItemSerializer(many=True, read_only=True) 
+    class Meta:
+        model=CartTable
+        fields='__all__'
+    
