@@ -10,7 +10,7 @@ urlpatterns = [
     # cart
     path('getcart/<int:id>/',getcart,name='getcart'),
     path('addtocart/',addtocart,name='addtocart'),
-    path('deletefromcart/',deletefromcart,name='removefromcart'),
+    path('deletefromcart/<int:id>/',deletefromcart,name='removefromcart'),
     path('delete/<int:id>/',delete,name='delete'),
     path('update/<int:id>/',update,name='update'),
 

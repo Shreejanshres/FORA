@@ -61,3 +61,41 @@ class Cartitem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.item.item_name} in {self.cart}"
+    
+class Order(models.Model):
+    user = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
+    cart = models.ForeignKey(CartTable, on_delete=models.CASCADE)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    PENDING = 'Pending'
+    PROCESSING = 'Processing'
+    COMPLETED = 'Completed'
+    Delivering = 'Delivering'
+    Delivered = 'Delivered'
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (PROCESSING, 'Processing'),
+        (COMPLETED, 'Completed'),
+        (Delivering, 'Delivering'),
+        (Delivered, 'Delivered'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Order by {self.user.name} - Total: ${self.total_price}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='order_items', on_delete=models.CASCADE)
+    item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    notes = models.TextField(null=True, blank=True)
+    restaurant = models.ForeignKey(RestaurantUser, on_delete=models.CASCADE)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        self.subtotal = self.item.price * self.quantity
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.item.item_name} in Order {self.order.id}"

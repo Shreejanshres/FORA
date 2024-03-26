@@ -8,6 +8,9 @@ import jwt
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import *
 from .serializers import *
+from django.db import IntegrityError
+
+
 def response(success, message):
     return JsonResponse({"success": success, "message": message})
 
@@ -104,71 +107,41 @@ def viewmenu(request):
     else:
         return response(False,"The method should be GET")
     
-def getcart(request,id):
-    if request.method=="GET":
-        print(id)
+@csrf_exempt
+def getcart(request, id):
+    if request.method == "GET":
         try:
-            cart=CartTable.objects.get(user_id=id)
-            print(cart)
-            serialized=CartTableSerializer(cart,many=False)
-           
-            return  JsonResponse(serialized.data,safe=False)
-        except:
-            return  response( False , "No Cart found for this user" )
+            cart = CartTable.objects.get(user_id=id)
+            serialized = CartTableSerializer(cart, many=False)
+            
+            # Retrieve the restaurant ID from the first item in the cart
+            restaurant_id = serialized.data.get("cart_item")[0]['restaurant']
+            restaurant = RestaurantUser.objects.get(id=restaurant_id);
+
+  
+            restaurant_serialized = RestaurantUserSerializer(restaurant, many=False)
+
+  
+            restaurant_name = restaurant_serialized.data['name']
+            restaurant_picture = restaurant_serialized.data['picture']
+  
+            data={
+                "cart": serialized.data,
+                "restaurant": restaurant_name,
+                "picture": restaurant_picture
+            }
+            print(data)
+          
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
     else:
-        return response(False,"The method should be GET")
+        return JsonResponse({"success": False, "message": "The method should be GET"})
 
-# @csrf_exempt  
-# def addtocart(request):
-#     if request.method == "POST":
-#         data=json.loads(request.body)
-#         user_id=data.get("user_id")
-#         restro_id=data.get("restaurant")
-#         if(CartTable.objects.filter(user_id=user_id).exists()):
-#             cartid=CartTable.objects.get(user_id=user_id)
-#             if(Cartitem.objects.filter(cart=cartid).exists()):
-#                 if(Cartitem.objects.filter(cart=cartid,restaurant=restro_id).exists()):
-#                     item =MenuItem.objects.get(id=data.get("item"))
-#                     if(Cartitem.objects.filter(cart=cartid,restaurant=restro_id,item=item).exists()):
-#                        return response(False,"Item already exists in cart")
-#                     else:
-#                         serializers=CartItemSerializer(data=data,many=False)
-#                         if serializers.is_valid():
-#                             serializers.save()
-#                             return response(True,"Item added to cart successfully")
-#                         else:
-#                             return response(False,str(serializers.errors))
-                    
-#                 else:
-#                     return response(False,"You can't add items from different restaurants")
-#             else:
-#                 serializers=CartItemSerializer(data=data,many=False)
-#                 if serializers.is_valid():
-#                     serializers.save()
-#                     return response(True,"Item added to cart successfully")
-#                 else:
-#                     return response(False,str(serializers.errors))
-           
-#         else:
-#             cartserializer = CartTableSerializer(data={"user_id": user_id})
-#             if cartserializer.is_valid():
-#                 cartserializer.save()
-#                 serializers=CartItemSerializer(data=data,many=False)
-#                 if serializers.is_valid():
-#                     serializers.save()
-#                     return response(True,"Item added to cart successfully")
-#                 else:
-#                     return response(False,str(serializers.errors))
-#             else:
-#                 return response(False,str(cartserializer.errors))
 
-#     else:
-#         return response(False,"The method should be POST")
 
-from django.db import IntegrityError
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
+
+
 
 @csrf_exempt  
 def addtocart(request):
@@ -205,22 +178,21 @@ def addtocart(request):
         return JsonResponse({"success": False, "message": "The method should be POST"})
 
 @csrf_exempt
-def deletefromcart(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        user_id = data.get("user_id")
-        item_id = data.get("item")
+def deletefromcart(request,id):
+    if request.method == "DELETE":
         try:
-            cart = CartTable.objects.get(user_id=user_id)
-            item = Cartitem.objects.get(cart=cart, item=item_id)
-            item.delete()
+            cart = CartTable.objects.get(user_id=id)
+            print(cart)
+            cart_items = Cartitem.objects.filter(cart=cart)
+            for item in cart_items:
+                item.delete()
             return JsonResponse({"success": True, "message": "Item deleted from cart successfully"})
         except CartTable.DoesNotExist:
             return JsonResponse({"success": False, "message": "Cart not found"})
         except Cartitem.DoesNotExist:
             return JsonResponse({"success": False, "message": "Item not found in cart"})
     else:
-        return JsonResponse({"success": False, "message": "The method should be POST"})
+        return JsonResponse({"success": False, "message": "The method should be Delete"})
     
 def delete(request,id):
     if request.method=="DELETE":

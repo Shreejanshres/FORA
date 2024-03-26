@@ -48,7 +48,6 @@ class DetailDataSerializer(serializers.ModelSerializer):
         return data
 
 class AddCartItemSerializer(serializers.ModelSerializer):
-   
     class Meta:
         model=Cartitem
         fields='__all__'
@@ -62,7 +61,24 @@ class CartItemSerializer(serializers.ModelSerializer):
     
 class CartTableSerializer(serializers.ModelSerializer):
     cart_item=CartItemSerializer(many=True, read_only=True) 
+    restaurantname=RestaurantUserSerializer(many=False, read_only=True)
     class Meta:
         model=CartTable
         fields='__all__'
+    
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    item=MenuSerializer(many=False, read_only=True)
+    class Meta:
+        model=OrderItem
+        fields='__all__'
+
+class OrderSerializer(serializers.ModelSerializer):
+    orderitem=OrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model=Order
+        fields='__all__'
+
+
     
