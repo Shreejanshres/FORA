@@ -1,0 +1,124 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:user/Theme/theme_provider.dart';
+
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({Key? key}) : super(key: key);
+
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool light = true; // Assuming this is your switch state
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text(
+          "Settings",
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
+      body: FutureBuilder<String>(
+        future: _getDataFromSharedPreferences(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            return body(snapshot.data ?? 'no data');
+          }
+        },
+      ),
+    );
+  }
+
+  Future<String> _getDataFromSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String data = prefs.getString('profile_pic') ?? 'no data';
+    return data;
+  }
+
+  Widget body(String data) {
+    String baseUrl = 'https://shreejan.pythonanywhere.com';
+    return Container(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Center(
+            child: Column(
+              children: [
+                Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: data != 'no data'
+                          ? NetworkImage('$baseUrl$data') as ImageProvider<Object>
+                          : AssetImage('images/defaultimage.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                OutlinedButton(
+                  onPressed: () {},
+
+                  child: Text("Edit Profile",),
+                )
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
+          InkWell(
+            onTap: () {},
+            child: ListTile(
+              title: Text("Accounts"),
+              leading: Icon(Icons.person),
+            ),
+          ),
+          SizedBox(height: 10),
+          InkWell(
+            onTap: () {},
+            child: ListTile(
+              title: Text("Security"),
+              leading: Icon(Icons.security),
+            ),
+          ),
+          SizedBox(height: 10),
+          InkWell(
+            onTap: () {},
+            child: ListTile(
+              title: Text("FAQ"),
+              leading: Icon(Icons.question_answer),
+            ),
+          ),
+          SizedBox(height: 10),
+          InkWell(
+            onTap: () {},
+            child: ListTile(
+              title: Text("Logout"),
+              leading: Icon(Icons.output),
+            ),
+          ),
+          Switch(
+            value: light,
+            activeColor: Colors.grey.shade600,
+            onChanged: (bool value) {
+              setState(() {
+                Provider.of<ThemeProvider>(context,listen: false).toggleTheme();
+                light = value;
+              });
+            },
+          )
+        ],
+      ),
+    );
+  }
+}
