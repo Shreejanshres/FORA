@@ -63,9 +63,6 @@ class _ItemPageState extends State<ItemPage> {
               // Handle any errors that might occur during the process
               print("Error: $e");
             }
-
-
-
           },
           splashColor: Colors.red.shade700,
           child: Container(

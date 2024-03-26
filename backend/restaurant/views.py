@@ -126,13 +126,15 @@ def getcart(request, id):
             restaurant_picture = restaurant_serialized.data['picture']
   
             data={
+                "success": True,
                 "cart": serialized.data,
                 "restaurant": restaurant_name,
-                "picture": restaurant_picture
+                "picture": restaurant_picture,               
             }
             print(data)
           
             return JsonResponse(data, safe=False)
+            # return JsonResponse({"success": False, "message": data},safe=False)
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)})
     else:
@@ -194,6 +196,7 @@ def deletefromcart(request,id):
     else:
         return JsonResponse({"success": False, "message": "The method should be Delete"})
     
+@csrf_exempt
 def delete(request,id):
     if request.method=="DELETE":
         try:
@@ -221,3 +224,7 @@ def update(request,id):
             return response(False,"Cart not found")
     else:
         return response(False,"The method should be PUT")
+
+
+
+    
