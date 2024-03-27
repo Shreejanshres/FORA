@@ -13,5 +13,4 @@ urlpatterns = [
     path('deletefromcart/<int:id>/',deletefromcart,name='removefromcart'),
     path('delete/<int:id>/',delete,name='delete'),
     path('update/<int:id>/',update,name='update'),
-
 ]

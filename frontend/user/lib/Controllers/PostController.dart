@@ -33,13 +33,14 @@ class Post{
             'id': post['id']?? '',
             'caption': post['caption'] ?? '',
             'postedAt': timeAgo,
-            'imageUrl': post['image'] != null ? (baseUrl + post['image']) : null,
+            'imageUrl': post['image'] != null ? (baseUrl + post['image']) : ' ',
             'likeCount': post['likes_count']?.toString() ?? '',
             'user': post['username'] ?? '',
-            'profileUrl': post['profile_pic'] != null ? (baseUrl + post['profile_pic']) : null ,
+            'profileUrl': post['profile_pic'] != null ? (baseUrl + post['profile_pic']) : ' ' ,
           };
           data.add(postJson);
         }
+
         print("finish post");
         isLoading=false;
       } catch (error) {

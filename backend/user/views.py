@@ -1,8 +1,10 @@
 
+import base64
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.files.base import ContentFile
 
 import json
 
@@ -138,19 +140,66 @@ def validate_otp(request):
 def add_recipe(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        user = CustomerUser.objects.get(id=data.get('user'))
-        recipe = Recipe.objects.create(
-            title=data.get('title'),
-            description=data.get('description'),
-            image=data.get('image'),
-            time=data.get('time'),
-            ingredients=data.get('ingredients'),
-            directions=data.get('directions'),
-            user=user
-        )
-        return JsonResponse({"success":True,"message":"Recipe added successfully"})
+        title=data.get('title')
+        description=data.get('description')
+        image=data.get('image')
+        time=data.get('time')
+        ingredients=data.get('ingredients')
+        directions=data.get('directions')
+        user_id = data.get('user')
+        try:
+            user = CustomerUser.objects.get(id=user_id)
+        except CustomerUser.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Invalid user ID"})
+      
+        try:
+            image_binary = base64.b64decode(image)
+            image_file = ContentFile(image_binary, name='temp_image.jpg')
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Error decoding image data: {str(e)}"})
+        
+        print(title,description,time,ingredients,directions,user)
+        try:
+            recipe = Recipe.objects.create(
+                title=title,
+                description=description,
+                image=image_file,
+                time=time,
+                ingredients=ingredients,
+                directions=directions,
+                user=user
+            )
+            return JsonResponse({"success": True, "message": "Recipe added successfully"})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Error creating recipe: {str(e)}"})
+
     else:
         return JsonResponse({"success":False,"message":"The request should be POST"})
+
+# @csrf_exempt
+# def add_recipe_with_image(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+#         serializer = RecipeSerializer(data=data)
+#         if serializer.is_valid():
+#             try:
+#                 # Decode the Base64 image data into binary
+#                 image_data = data.get('image')
+#                 image_binary = base64.b64decode(image_data)
+#                 image_file = ContentFile(image_binary, name='temp_image.jpg')
+                
+#                 # Save the recipe instance
+#                 serializer.save(image=image_file)
+
+#                 return JsonResponse({"success": True, "message": "Recipe added successfully"})
+#             except Exception as e:
+#                 return JsonResponse({"success": False, "message": f"Error adding recipe: {e}"})
+#         else:
+#             return JsonResponse({"success": False, "message": serializer.errors})
+#     else:
+#         return JsonResponse({"success": False, "message": "The request should be POST"})
+
+
 
 @csrf_exempt
 def get_recipe(request):

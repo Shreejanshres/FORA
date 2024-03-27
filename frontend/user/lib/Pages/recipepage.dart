@@ -5,6 +5,8 @@ import 'package:flutter/painting.dart';
 import 'package:user/Controllers/RecipeContoller.dart';
 import 'package:user/Controllers/PostController.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:user/Pages/AddRecipe.dart';
+import 'dart:math';
 
 
 class RecipePage extends StatefulWidget {
@@ -17,19 +19,22 @@ class RecipePage extends StatefulWidget {
 class _RecipePageState extends State<RecipePage> {
   Recipe recipe = new Recipe();
   Post post = new Post();
-
+  final random = Random();
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _loadRecipe(); // Call method to load recipe data when the widget is initialized
+  // }
   @override
-  void initState() {
-    super.initState();
-    _loadRecipe(); // Call method to load recipe data when the widget is initialized
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadRecipe();
   }
-
   Future<void> _loadRecipe() async {
     try {
       await recipe
           .getRecipe(); // Assuming getRecipe() is an asynchronous method
       await post.getPost();
-      print(post.data[0]['profileUrl']);
       setState(() {}); // Update the state to rebuild the UI with the fetched data
     } catch (e) {
       // Handle error if any
@@ -45,12 +50,31 @@ class _RecipePageState extends State<RecipePage> {
   }
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: Text("Recipes",style: TextStyle(fontWeight: FontWeight.bold)),
           actions: [
-          ElevatedButton(onPressed: (){_printSharedPreferences();}, child: Row(
+          ElevatedButton(onPressed: (){
+            _printSharedPreferences();
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => addRecipe(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  var begin = Offset(0.0, 1.0);
+                  var end = Offset.zero;
+                  var curve = Curves.ease;
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
+            );
+            }, child: Row(
             children: [
               Icon(Icons.book_outlined,color: Colors.white,),
               Text("Add Recipe",style: TextStyle(color: Colors.white),)
@@ -133,7 +157,12 @@ class _RecipePageState extends State<RecipePage> {
                     itemCount: 2,
                     separatorBuilder: (context, index) => SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      return recipeContain(index);
+                    if (index < recipe.imageUrls.length && recipe.imageUrls[index].isNotEmpty) {
+                      final randomIndex = random.nextInt(recipe.titles.length);
+                      return recipeContain(randomIndex);
+                    }else{
+                      return Container();
+                    }
                     },
                   ),
                  ),
@@ -147,7 +176,12 @@ class _RecipePageState extends State<RecipePage> {
                       itemCount: post.data.length,
                       separatorBuilder: (context, index) => SizedBox(width:15),
                       itemBuilder: (context, index) {
-                        return postContain(index);
+                      if (index < post.data.length && post.data.isNotEmpty) {
+                        final randomIndex = random.nextInt(post.data.length);
+                        return postContain(randomIndex);
+                      }else{
+                        Container();
+                      }
                       },
                     ),
                   ),
@@ -159,13 +193,19 @@ class _RecipePageState extends State<RecipePage> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                            crossAxisCount:2,
                             crossAxisSpacing: 10.0,
                             mainAxisSpacing: 10.0,
                           ),
                           itemCount: recipe.titles.length,
                           itemBuilder: (context, index) {
-                            return recipeContain(index);
+                          if (index < recipe.imageUrls.length && recipe.imageUrls[index].isNotEmpty) {
+                            final randomIndex = random.nextInt(
+                                recipe.titles.length);
+                            return recipeContain(randomIndex);
+                          }else{
+                            return Placeholder();
+                          }
                           },
                         ),
                   ),
@@ -218,7 +258,9 @@ class _RecipePageState extends State<RecipePage> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: NetworkImage(recipe.profileUrls[index]),
+                            image: recipe.profileUrls[index]!= null ?
+                            NetworkImage(recipe.profileUrls[index])
+                            :AssetImage('images/Logo.png') as ImageProvider,
                             fit: BoxFit.fitWidth,
                           ),
                         ),
@@ -255,8 +297,6 @@ class _RecipePageState extends State<RecipePage> {
   InkWell postContain(int index) {
     return InkWell(
         onTap: () {
-
-
           },
 
         child: ClipRRect(
@@ -290,7 +330,9 @@ class _RecipePageState extends State<RecipePage> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
-                                      image: NetworkImage(post.data[index]['profileUrl']),
+                                     image: post.data[index]['profileUrl'] != null
+                                            ? NetworkImage(post.data[index]['profileUrl'].toString().trim())
+                                          : AssetImage('images/Logo.png') as ImageProvider,
                                       fit: BoxFit.fitWidth,
                                     ),
                                   ),

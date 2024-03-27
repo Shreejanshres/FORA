@@ -44,6 +44,7 @@ dependencies:
   transparent_image: ^2.0.1
   timeago: ^3.6.1
   provider: ^6.1.2
+  image_picker: ^1.0.7
 
 
 dev_dependencies:

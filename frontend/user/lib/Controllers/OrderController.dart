@@ -61,7 +61,6 @@ class Order{
       name=response.data['restaurant'];
       picture=baseUrl+response.data['picture'];
     }
-
   }
 
   void updateSubtotal() {
