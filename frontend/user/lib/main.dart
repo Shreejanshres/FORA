@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:user/Pages/DetailRecipe.dart';
+import 'package:user/PostSystem/postpage.dart';
 import 'package:user/RestaurantSystem/ItemPage.dart';
 import 'package:user/RestaurantSystem/restaurantpage.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/restaurantpage': (context) => const RestaurantPage(),
         '/detailrestaurant': (context)=> const DetailRecipe(  ),
         '/itempage': (context)=> const ItemPage(),
+        '/detailpost': (context)=> const postPage(),
 
       },
     );

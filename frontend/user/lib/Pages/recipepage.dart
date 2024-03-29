@@ -297,6 +297,7 @@ class _RecipePageState extends State<RecipePage> {
   InkWell postContain(int index) {
     return InkWell(
         onTap: () {
+          Navigator.pushNamed(context, '/detailpost', arguments: index);
           },
 
         child: ClipRRect(

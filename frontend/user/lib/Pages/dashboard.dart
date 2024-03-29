@@ -57,6 +57,10 @@ class _DashboardState extends State<Dashboard> {
           icon: Icon(Icons.book),
           label: 'Recipe',
         ),
+        // BottomNavigationBarItem(
+        //     icon: Icon(Ico),
+        //     label:'Post'
+        // ),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_cart_rounded),
           label: 'Cart',

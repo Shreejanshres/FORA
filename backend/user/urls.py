@@ -21,7 +21,7 @@ urlpatterns = [
     path("deletecomment/<int:id>",delete_comment,name="delete_comment"),
 
     path("addlike/",add_like,name="add_like"),
-    path("getlike/",get_like,name="get_like"),
+    path("getlike/",isliked,name="get_like"),
     path("deletelike/<int:id>",delete_like,name="delete_like"),
 
     path("addfollow/",add_follow,name="add_follow"),

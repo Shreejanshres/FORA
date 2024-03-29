@@ -315,11 +315,13 @@ def add_like(request):
         return JsonResponse({"success":False,"message":"The request should be POST"})
 
 @csrf_exempt
-def get_like(request):
+def isliked(request):
     if request.method == 'GET':
-        likes = Like.objects.all()
-        serializer = LikeSerializer(likes, many=True)
-        return JsonResponse({"success":True,"message":serializer.data})
+        data=json.loads(request.body)
+        user=data.get('user') 
+        post=data.get('post')
+        likes = Like.objects.filter(user=user, post=post).exists()
+        return JsonResponse({"success":True,"message":likes
     else:
         return JsonResponse({"success":False,"message":"The request should be GET"})
 

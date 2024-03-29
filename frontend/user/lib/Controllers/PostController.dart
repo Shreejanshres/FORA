@@ -1,4 +1,5 @@
 import "package:dio/dio.dart";
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:flutter/cupertino.dart';
@@ -15,9 +16,25 @@ class Post{
   List<String> commentPicUrl=[];
   List<String> commentedAt=[];
   List<Map<String, dynamic>> data = [];
+  List<Map<String, dynamic>> commentdata = [];
   bool isLoading=true;
-  String baseUrl='http://192.168.1.66:8000';
+  String baseUrl='http://192.168.1.103:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
+
+  Future<int?> getData()async {
+    var prefs = await SharedPreferences.getInstance();
+    String? userIdString = prefs.getString('id');
+    if (userIdString != null) {
+      try {
+        int userId = int.parse(userIdString);
+        return userId;
+      } catch (e) {
+        print("Error parsing user ID: $e");
+        return null;
+      }
+    }
+    return null; // Return null if SharedPreferences value is null
+  }
 
   Future<void> getPost() async {
     if(data.isEmpty) {
@@ -49,7 +66,7 @@ class Post{
     }
   }
   Future<void> getComment(id) async {
-    if(data.isEmpty) {
+    if(commentdata.isEmpty) {
       try {
         var response = await Dio().get('$baseUrl/getcomment/$id');
         List<dynamic> comments = response.data['message'];
@@ -65,8 +82,9 @@ class Post{
             'text': comment['text']?? ''
 
           };
-          data.add(commentJson);
+          commentdata.add(commentJson);
         }
+        print(commentdata);
         print("finish comment");
         isLoading=false;
       } catch (error) {
@@ -74,5 +92,11 @@ class Post{
       }
     }
   }
+
+  // Future<bool> _isLiked() async {
+  //   int? userId = await getData();
+  //
+  //   var response= await Dio().get('$baseUrl/getlike/');
+  // }
 }
 
