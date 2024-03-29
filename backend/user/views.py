@@ -321,7 +321,7 @@ def isliked(request):
         user=data.get('user') 
         post=data.get('post')
         likes = Like.objects.filter(user=user, post=post).exists()
-        return JsonResponse({"success":True,"message":likes
+        return JsonResponse({"success":True,"message":likes})
     else:
         return JsonResponse({"success":False,"message":"The request should be GET"})
 
