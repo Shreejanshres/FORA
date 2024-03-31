@@ -59,7 +59,7 @@ class Order{
         subtotal+=total;
       }
       name=response.data['restaurant'];
-      picture=baseUrl+response.data['picture'];
+      picture=response.data['picture'] != null ? baseUrl + response.data['picture'] : '';
     }
   }
 

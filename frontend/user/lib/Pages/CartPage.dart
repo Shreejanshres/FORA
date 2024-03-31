@@ -21,6 +21,7 @@ class _CartState extends State<Cart> {
   }
 
   Future<void> _getCartData() async {
+    isLoading = true;
     await order.getcart();
     for (int i = 0; i < order.cartitem.length; i++) {
       notesControllers.add(TextEditingController(text: order.notes[i]));
@@ -41,8 +42,6 @@ class _CartState extends State<Cart> {
         backgroundColor: Color(0xFFED4A25),
       ),
       body: isLoading ? LinearProgressIndicator() : body(),
-      bottomNavigationBar:
-      isLoading ? SizedBox(width:10,height: 10,) : placeOrder(),
     );
   }
 
@@ -53,83 +52,73 @@ class _CartState extends State<Cart> {
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
-            Container(
-              color: Colors.green,
-              height: 400,
-              child: SingleChildScrollView(
-                child: Column(
+            Column(
                   children: [
-                    Row(
-                      children: [
-                        order.picture.isEmpty ? SizedBox(width: 50, height: 50) :
-                        Image.network(
-                          order.picture,
-                          width: 50,
-                          height: 50,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          order.name,
-                          style: TextStyle(
-                            fontFamily: "Poppins",
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
+                    Container(
+                      height: 80,
+                      color:Colors.white,
+                      child:   Row(
+                        children: [
+                          order.picture.isEmpty ? SizedBox(width: 50, height: 50) :
+                          Image.network(
+                            order.picture,
+                            width: 50,
+                            height: 50,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 10),
+                          Text(
+                            order.name,
+                            style: TextStyle(
+                              fontFamily: "Poppins",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    SizedBox(height: 10,),
                     order.cartitem.isEmpty
-                        ? Container(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Text(
-                        'No items in the cart',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
+                         ? Container(
+                       padding: EdgeInsets.symmetric(vertical: 20),
+                       child: Text(
+                         'No items in the cart',
+                         style: TextStyle(
+                           fontSize: 18,
+                           color: Colors.grey,
+                         ),
+                       ),
+                     )
+                         :  SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: order.cartitem.length,
+                              itemBuilder: (context, index) {
+                                return items(index);
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 15,),
+                    Container(
+                      width: double.infinity,
+                      color: Colors.white,
+                      child: ElevatedButton(onPressed: (){}, child: Text("Continue",style: TextStyle(fontSize: 18,color: Colors.white)),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFED4A25)),
+
                         ),
                       ),
                     )
-                        : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: order.cartitem.length,
-                      itemBuilder: (context, index) {
-                        return items(index);
-                      },
-                    ),
                   ],
                 ),
-              )
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget placeOrder() {
-    return BottomAppBar(
-      color: Color(0xFFED4A25),
-      child: InkWell(
-        onTap: () {
-          order.placeorder();
-        },
-        splashColor: Colors.red.shade700,
-        child: Container(
-          width: double.maxFinite,
-          padding: EdgeInsets.all(10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Place Order",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontFamily: "Poppins",
-                ),
-              ),
-            ],
-          ),
+
+          ],
         ),
       ),
     );
@@ -137,114 +126,118 @@ class _CartState extends State<Cart> {
 
   Widget items(int index) {
     return Container(
+      color: Colors.white,
       width: double.infinity,
       padding: EdgeInsets.all(10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    order.cartitem[index]['item']['item_name'],
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    '\$${order.price[index].toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          order.quantity[index] += 1;
-                          order.updateSubtotal();
-                          setState(() {});
-                        },
-                        icon: Icon(Icons.add),
+      child:  Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      order.cartitem[index]['item']['item_name'],
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
                       ),
-                      Text('${order.quantity[index]}'),
-                      IconButton(
-                        onPressed: () {
-                          if (order.cartitem[index]['quantity'] != 1) {
-                            order.quantity[index] -= 1;
-                          }
-                          order.updateSubtotal();
-                          setState(() {});
-                        },
-                        icon: Icon(Icons.remove),
+                    ),
+                    Text(
+                      '\$${order.price[index].toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Poppins',
                       ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      print(order.cartitem[index]['id']);
-                      bool response = await order.delete(order.cartitem[index]['id']);
-                      if(response){
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Item deleted"),
-                          ),
-                        );
-                        setState(() {
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            order.quantity[index] += 1;
+                            order.updateSubtotal();
+                            setState(() {});
+                          },
+                          icon: Icon(Icons.add),
+                        ),
+                        Text('${order.quantity[index]}',style: TextStyle(fontSize: 14),),
+                        IconButton(
+                          onPressed: () {
+                            if (order.cartitem[index]['quantity'] >= 1) {
+                              order.quantity[index] -= 1;
+                            }
+                            order.updateSubtotal();
+                            setState(() {});
+                          },
+                          icon: Icon(Icons.remove),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        print(order.cartitem[index]['id']);
+                        bool response = await order.delete(order.cartitem[index]['id']);
+                        if(response){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Item deleted"),
+                            ),
+                          );
                           _getCartData();
-                        });
-                      }
-                      else{
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("failed to delete"),
-                          ),
-                        );
+                          setState(() {
+                            _getCartData();
+                          });
+                        }
+                        else{
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("failed to delete"),
+                            ),
+                          );
 
-                      }
-                    },
-                    icon: Icon(
-                      Icons.delete,
-                      color: Colors.red.shade800,
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-          Container(
-            height: 100,
-            decoration: BoxDecoration(
-              color: Color(0xFFF3F1F1),
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
+                        }
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.red.shade800,
+                      ),
+                    )
+                  ],
+                ),
+              ],
             ),
-            child: TextField(
-              controller: notesControllers[index],
-              maxLines: null,
-              onChanged: (value) {
-                order.notes[index] = value;
-                print(order.notes[index]);
-              },
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Color(0xFFF3F1F1),
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: TextField(
+                controller: notesControllers[index],
+                maxLines: null,
+                onChanged: (value) {
+                  order.notes[index] = value;
+                  print(order.notes[index]);
+                },
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                ),
               ),
             ),
-          ),
-          Divider(),
-        ],
-      ),
+            Divider(),
+
+          ],
+        ),
+
     );
   }
 }

@@ -14,6 +14,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   String userLocation = '';
   String baseUrl = 'http://192.168.1.66:8000';
+  // String baseUrl='http://shreejan.pythonanywhere.com';
   Restaurant restaurant = Restaurant(); // Initialize your Restaurant class
   bool isLoading=true;
   @override
@@ -75,9 +76,9 @@ class _HomepageState extends State<Homepage> {
                 String name = restaurant.restaurants[index]['name'];
                 String pictureUrl =
                     restaurant.restaurants[index]['picture'] ?? '';
-                print(baseUrl + pictureUrl);
+                print(baseUrl+'/' + pictureUrl);
                 int id= restaurant.restaurants[index]['id'] ?? 0;
-                return restaurantDisplay(name,id, index, baseUrl + pictureUrl);
+                return restaurantDisplay(name,id, index, pictureUrl);
               },
             ),
           ),
@@ -134,11 +135,13 @@ class _HomepageState extends State<Homepage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.network(
-              pictureUrl,
-              width: 50,
-              height: 50,
-            ),
+           pictureUrl.isNotEmpty?
+           Image.network(
+             baseUrl+pictureUrl,
+             width: 50,
+             height: 50,
+           ) :
+           Image.asset('images/Logo.png',width: 50,height: 50,),
             Text(name),
           ],
         ),

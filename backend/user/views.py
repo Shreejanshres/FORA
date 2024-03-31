@@ -235,12 +235,31 @@ def get_recipe_by_id(request, id):
 def add_post(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        user = CustomerUser.objects.get(id=data.get('user'))
-        post = Post.objects.create(
-            image=data.get('image'),
-            caption=data.get('caption'),
-            user=user
-        )
+        userId=data.get('user')
+        caption=data.get('caption')
+        image=data.get('image')
+        print(userId,caption,image)
+        try:
+            user = CustomerUser.objects.get(id=userId)
+        except CustomerUser.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Invalid user ID"})
+        
+        if(image is not None):
+            image_binary = base64.b64decode(image)
+            image_file = ContentFile(image_binary, name='temp_image.jpg')
+        else:
+            return JsonResponse({"success": False, "message": "Please upload Image as well"})
+        
+        try:
+            post = Post.objects.create(
+                user=user,
+                caption=caption,
+                image=image_file
+            )
+            return JsonResponse({"success":True,"message":"Post added successfully"})
+        except Exception as e:
+            return JsonResponse({"success":False,"message":f"Error creating post: {str(e)}"})
+
         return JsonResponse({"success":True,"message":"Post added successfully"})
     else:
         return JsonResponse({"success":False,"message":"The request should be POST"})

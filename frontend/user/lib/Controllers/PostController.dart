@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import "package:dio/dio.dart";
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+
 
 
 class Post{
@@ -18,7 +20,7 @@ class Post{
   List<Map<String, dynamic>> data = [];
   List<Map<String, dynamic>> commentdata = [];
   bool isLoading=true;
-  String baseUrl='http://192.168.1.103:8000';
+  String baseUrl='http://192.168.1.66:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
 
   Future<int?> getData()async {
@@ -33,7 +35,7 @@ class Post{
         return null;
       }
     }
-    return null; // Return null if SharedPreferences value is null
+    return null;
   }
 
   Future<void> getPost() async {
@@ -93,10 +95,35 @@ class Post{
     }
   }
 
-  // Future<bool> _isLiked() async {
-  //   int? userId = await getData();
-  //
-  //   var response= await Dio().get('$baseUrl/getlike/');
-  // }
-}
+  Future<Map<String, dynamic>> addPost(String jsonData) async {
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    try {
+      Map<String, dynamic> postdata = jsonDecode(jsonData);
+      postdata['user'] = userId;
+      String updatedJsonData = jsonEncode(postdata);
+      var response = await Dio().post(
+        '$baseUrl/addpost/',
+        data: updatedJsonData,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      print("Error in adding recipe: $e");
+      throw e;
+    }
+  }
 
+}
+pickImage(ImageSource source) async{
+  final ImagePicker _imagePicker = ImagePicker();
+  XFile? _file = await _imagePicker.pickImage(source: source);
+  if(_file != null){
+    return await _file.readAsBytes();
+  }
+  print(" no Image Selected");
+}

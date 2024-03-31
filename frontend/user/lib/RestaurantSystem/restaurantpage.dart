@@ -43,7 +43,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
   }
 
   SingleChildScrollView body() {
-    String BaseUrl = 'https://192.168.1.66:8000';
+    // String BaseUrl = 'https://192.168.1.66:8000';
+    String BaseUrl='http://shreejan.pythonanywhere.com';
     return SingleChildScrollView(
       child: Container(
         width: double.maxFinite,
@@ -56,12 +57,18 @@ class _RestaurantPageState extends State<RestaurantPage> {
                   width: double.maxFinite,
                   child: Opacity(
                     opacity: 0.7,
-                    child: Image.network(
-                      '${BaseUrl}${restaurant.restrodata['coverphoto']}',
+                    child: restaurant.restrodata['coverphoto'] != null
+                        ? Image.network(
+                      '${BaseUrl}/${restaurant.restrodata['coverphoto']}',
+                      fit: BoxFit.cover,
+                    )
+                        : Image.asset(
+                      'images/Logo.png',
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
+
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -69,12 +76,18 @@ class _RestaurantPageState extends State<RestaurantPage> {
                     color: Colors.white,
                     height: 100,
                     width: 100,
-                    child: Image.network(
-                      '${BaseUrl}${restaurant.restrodata['picture']}',
+                    child: restaurant.restrodata['picture'] != null
+                        ? Image.network(
+                      '${BaseUrl}/${restaurant.restrodata['picture']}',
+                      fit: BoxFit.cover,
+                    )
+                        : Image.asset(
+                      'images/Logo.png',
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
+
               ],
             ),
             Container(

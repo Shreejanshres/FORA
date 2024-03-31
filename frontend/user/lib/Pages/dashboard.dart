@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:user/Pages/CartPage.dart';
 import 'package:user/Pages/Settings.dart';
+import 'package:user/PostSystem/addPost.dart';
 
 import 'package:user/RestaurantSystem/homepage.dart';
 import 'package:user/Pages/recipepage.dart';
@@ -31,8 +32,10 @@ class _DashboardState extends State<Dashboard> {
       case 1:
         return RecipePage();
       case 2:
-        return Cart();
+        return addPost();
       case 3:
+        return Cart();
+      case 4:
         return SettingsPage();
       default:
         return const Homepage(); // Default to the home page if index is not recognized
@@ -57,10 +60,10 @@ class _DashboardState extends State<Dashboard> {
           icon: Icon(Icons.book),
           label: 'Recipe',
         ),
-        // BottomNavigationBarItem(
-        //     icon: Icon(Ico),
-        //     label:'Post'
-        // ),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label:'Post'
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_cart_rounded),
           label: 'Cart',
