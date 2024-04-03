@@ -207,24 +207,58 @@ def delete(request,id):
             return response(False,"Cart not found")
     else:
         return response(False,"The method should be DELETE")
-
 @csrf_exempt
-def update(request,id):
-    if request.method=="PUT":
-        data=json.loads(request.body)
+def update(request):
+    if request.method == "PUT":
         try:
-            cart=Cartitem.objects.get(id=id)
-            serializer=AddCartItemSerializer(cart,data=data,many=False)
-            if serializer.is_valid():
-                serializer.save()
-                return response(True,"Cart updated successfully")
-            else:
-                return response(False,str(serializer.errors))
-        except:
-            return response(False,"Cart not found")
-    else:
-        return response(False,"The method should be PUT")
+            data = json.loads(request.body)
+            for item_data in data:
+                try:
+                    id = item_data.get("id")
+                    cart = Cartitem.objects.get(id=id)
+                    itemid = item_data.get("item").get("id")
+                    item_data["item"] = itemid
 
+                    serializer = AddCartItemSerializer(cart, data=item_data, many=False)
+                    if serializer.is_valid():
+                        serializer.save()
+                       
+                    else:
+                        return JsonResponse({"success": False, "error": str(serializer.errors)})
+                except Cartitem.DoesNotExist:
+                    return JsonResponse({"success": False, "message": "Cart not found"})
+            return JsonResponse({"success": True, "message": "Cart updated successfully"})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": "An error occurred: " + str(e)})
+    else:
+        return JsonResponse({"success": False, "message": "The method should be PUT"})
+
+def getbill(request,id):
+    if request.method=="GET":
+        try:
+            print("inside")
+            cart=CartTable.objects.get(user_id=id).id
+            print(cart)
+            cart_items = Cartitem.objects.filter(cart=cart)
+            subtotal=0
+            for item in cart_items:
+                subtotal+=item.item.price*item.quantity
+            subtotal=round(float(subtotal),2)
+            delivery_charge=50
+            print("hji")
+            print(subtotal)
+            tax = round(float(subtotal) * 0.13,2)
+            print("Tax:", tax)
+            try:
+                total=subtotal+delivery_charge+tax
+            except Exception as e:
+                print(e)
+            print(total)
+            return JsonResponse({"success": True, "message": {"subtotal": subtotal, "delivery_charge": delivery_charge, "tax": tax, "total": total}})
+        except:
+            return  response( False , "No Cart found for this user" )
+    else:
+        return response(False,"The method should be GET")
 
 
     

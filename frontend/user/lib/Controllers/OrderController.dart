@@ -82,13 +82,18 @@ class Order{
       return false;
     }
   }
+  Future<Map<String,dynamic>> updatecart() async {
+    for(int i=0;i<cartitem.length;i++){
+      cartitem[i]['quantity']=quantity[i];
+      cartitem[i]['notes']=notes[i];
+    }
+    var response = await Dio().put('$baseUrl/restaurant/update/',data: jsonEncode(cartitem));
+    return response.data;
 
-  void placeorder(){
-    print(cartitem);
-    print(notes);
-    print(price);
-    print(subtotal);
-    print(quantity);
-
+  }
+  Future<Map<String,dynamic>> getbill() async{
+    int? userId = await getData();
+    var response= await Dio().get('http://192.168.1.66:8000/restaurant/getbill/$userId/');
+    return response.data;
   }
 }

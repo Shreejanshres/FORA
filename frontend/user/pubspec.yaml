@@ -72,6 +72,8 @@ flutter:
   assets:
     - images/
     - images/load.gif
+    - images/khalti.svg
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
