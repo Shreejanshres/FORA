@@ -64,7 +64,10 @@ class Cartitem(models.Model):
     
 class Order(models.Model):
     user = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
-    cart = models.ForeignKey(CartTable, on_delete=models.CASCADE)
+    restaurant= models.ForeignKey(RestaurantUser, on_delete=models.CASCADE)
+    payment_method = models.CharField(max_length=50)
+    ispaid=models.BooleanField(default=False)
+    address=models.CharField(max_length=100)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     PENDING = 'Pending'
     PROCESSING = 'Processing'
@@ -90,7 +93,6 @@ class OrderItem(models.Model):
     item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     notes = models.TextField(null=True, blank=True)
-    restaurant = models.ForeignKey(RestaurantUser, on_delete=models.CASCADE)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
@@ -99,3 +101,4 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.item.item_name} in Order {self.order.id}"
+    

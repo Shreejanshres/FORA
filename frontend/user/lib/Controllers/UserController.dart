@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class User{
   bool isLogged=false;
   String errormessage = "";
-  String baseUrl='http://192.168.1.66:8000';
+  String baseUrl='http://10.22.10.79:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
   Future<void> login(email,password)async{
     try {

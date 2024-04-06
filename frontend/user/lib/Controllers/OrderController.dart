@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:dio/dio.dart";
 class Order{
-  String baseUrl='http://192.168.1.66:8000';
+  String baseUrl='http://10.22.10.79:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
    List<dynamic> cartitem=[];
    String name='';
@@ -38,6 +38,7 @@ class Order{
       "notes": notes
     };
     String postData = json.encode(data);
+    print(postData);
       var response = await Dio().post('$baseUrl/restaurant/addtocart/', data: postData);
       return response.data;
   }
@@ -93,7 +94,21 @@ class Order{
   }
   Future<Map<String,dynamic>> getbill() async{
     int? userId = await getData();
-    var response= await Dio().get('http://192.168.1.66:8000/restaurant/getbill/$userId/');
+    var response= await Dio().get('http://10.22.10.79:8000/restaurant/getbill/$userId/');
     return response.data;
+  }
+
+  Future<Map<String,dynamic>> order(String payment_method, bool ispaid, String address, double totalprice )async{
+    int? userId = await getData();
+  print("from order function: ");
+  Map<String,dynamic> data={
+    "user_id": userId,
+    "is_paid":ispaid,
+    "address":address,
+    "payment_method": payment_method,
+    "total_price":totalprice,
+  };
+  var response= await Dio().post('$baseUrl/restaurant/order/',data: jsonEncode(data));
+  return response.data;
   }
 }

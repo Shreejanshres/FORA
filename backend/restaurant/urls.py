@@ -14,4 +14,7 @@ urlpatterns = [
     path('delete/<int:id>/',delete,name='delete'),
     path('update/',update,name='update'),
     path('getbill/<int:id>/',getbill,name='register'),
+
+    #order
+    path('order/',addtoorder,name='addtoorder'),
 ]

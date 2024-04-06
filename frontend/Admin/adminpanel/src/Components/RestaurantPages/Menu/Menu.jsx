@@ -36,35 +36,6 @@ const columns = [
   },
 ];
 
-// const rows = [
-//   {
-//     id: 1,
-//     restaurant: "foodhub by H2O",
-//     address: "Jhochhen",
-//     phone: "9841385218",
-//     email: "foodhub@gmail.com",
-//     ownerName: "John Doe",
-//   },
-// ];
-
-const CssTextField = styled(TextField)({
-  "& label.Mui-focused": {
-    color: "#A0AAB4",
-  },
-
-  "& .MuiInput-underline:after": {
-    borderBottomColor: "#B2BAC2",
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "#E0E3E7",
-    },
-    "&:hover fieldset": {
-      borderColor: "#B2BAC2",
-    },
-  },
-});
-
 const Restaurant = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -74,11 +45,19 @@ const Restaurant = () => {
   const [headings, setHeadings] = useState([]);
   const [newHeading, setNewHeading] = useState("New Heading");
 
+  const [restaurant_id, setRestaurant_id] = useState(1);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const data = JSON.parse(atob(token.split(".")[1]));
+      setRestaurant_id(data.data.ownername);
+    }
+  }, []);
   useLayoutEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/restaurant/display_headings/",
+          "http://127.0.0.1:8000/restaurant/display_headings/${restaurant_id}",
           {
             params: {
               id: 1,

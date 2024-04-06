@@ -49,10 +49,17 @@ class _CartState extends State<Cart> {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child:  order.cartitem.isEmpty?Container(
+          alignment: Alignment.center,
+          child: const Text(
+            'No items in the cart',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+        ):Column(
           children: [
-            Column(
-              children: [
                 Container(
                   height: 80,
                   color: Colors.white,
@@ -80,18 +87,7 @@ class _CartState extends State<Cart> {
                 const SizedBox(
                   height: 10,
                 ),
-                order.cartitem.isEmpty
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: const Text(
-                          'No items in the cart',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      )
-                    : SingleChildScrollView(
+               SingleChildScrollView(
                         child: Column(
                           children: [
                             ListView.builder(
@@ -115,6 +111,7 @@ class _CartState extends State<Cart> {
                       print(order.notes);
                      Map<String,dynamic> response= await order.updatecart();
                      if(response['success']){
+                       print(order.cartitem[0]['restaurant']);
                        Navigator.pushNamed(context, '/information');
                      }else {
                        ScaffoldMessenger.of(context).showSnackBar(
@@ -133,8 +130,7 @@ class _CartState extends State<Cart> {
                         style: TextStyle(fontSize: 18, color: Colors.white)),
                   ),
                 )
-              ],
-            ),
+
           ],
         ),
       ),

@@ -24,7 +24,9 @@ def login(request):
             user=RestaurantUser.objects.get(email=email)
             if check_password(password,user.password):
                 serialized=RestaurantUserSerializer(user,many=False)
+                request.session['data'] = serialized.data
                 payload = {"data": serialized.data}
+                request.session['data'] = serialized.data
                 token = jwt.encode(payload, "secret", algorithm="HS256")
                 return JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
             else :  
@@ -260,5 +262,60 @@ def getbill(request,id):
     else:
         return response(False,"The method should be GET")
 
+@csrf_exempt
+def getrestro(id):
+    try:
+        cart = CartTable.objects.get(user_id=id)
+        serialized = CartTableSerializer(cart, many=False)
+        # Retrieve the restaurant ID from the first item in the cart
+        restaurant_id = serialized.data.get("cart_item")[0]['restaurant']
+        # Fetch the RestaurantUser instance using the restaurant_id
+        restaurant_user = RestaurantUser.objects.get(id=restaurant_id)
+        return restaurant_user
+    except Exception as e:
+        return None
+   
 
+@csrf_exempt
+def addtoorder(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user_id = data.get("user_id")
+            is_paid = data.get("is_paid")
+            address = data.get("address")
+            payment_method = data.get("payment_method")
+            total_price = data.get("total_price")
+            print(user_id, is_paid, address, payment_method, total_price)
+            
+            # Fetch user and restaurant instances
+            user = CustomerUser.objects.get(id=user_id)
+            restro = getrestro(user_id)  # Assuming this function returns the RestaurantUser instance
+            
+            # Check if all required fields are provided
+            if None in [user, is_paid, address, payment_method, total_price, restro]:
+                raise ValueError("Required fields are missing")
+            
+            # Create order
+            order = Order.objects.create(user=user, restaurant=restro, ispaid=is_paid, address=address, 
+                                         payment_method=payment_method, total_price=total_price)
+            
+            # Get cart items
+            cart = CartTable.objects.get(user_id=user_id)
+            cart_items = Cartitem.objects.filter(cart=cart)
+            
+            # Create order items from cart items
+            for item in cart_items:
+                OrderItem.objects.create(order=order, item=item.item, quantity=item.quantity,
+                                          notes=item.notes, subtotal=item.item.price * item.quantity)
+            
+            # Clear cart items
+            cart_items.delete()
+            
+            return JsonResponse({"success": True, "message": "Order placed successfully"})
+        
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
     
+    else:
+        return JsonResponse({"success": False, "message": "The method should be POST"})
