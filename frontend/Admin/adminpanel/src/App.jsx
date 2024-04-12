@@ -15,6 +15,7 @@ import Admin from "./Components/AdminPages/Admin/Admin.jsx";
 import Restaurantlogin from "./Components/RestaurantPages/Login.jsx";
 import Restaurantdashboard from "./Components/RestaurantPages/Dashboard.jsx";
 import Restaurantmenu from "./Components/RestaurantPages/Menu/Menu.jsx";
+import Orders from "./Components/RestaurantPages/Orders/Orders.jsx";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -37,12 +38,14 @@ function App() {
               <Route path="/admin/dashboard" element={<Admindashboard />} />
               <Route path="/admin/restaurant" element={<Restaurant />} />
               <Route path="/admin/admin" element={<Admin />} />
+
               <Route path="/restaurant" element={<Restaurantlogin />} />
               <Route
                 path="/restaurant/dashboard"
                 element={<Restaurantdashboard />}
               />
               <Route path="/restaurant/menu" element={<Restaurantmenu />} />
+              <Route path="/restaurant/orders" element={<Orders />} />
             </Routes>
           </main>
         </div>

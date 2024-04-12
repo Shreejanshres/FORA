@@ -75,8 +75,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     status=serializers.CharField(required=False)
-    orderitem=OrderItemSerializer(many=True, read_only=True)
-
+    order_items=OrderItemSerializer(many=True, read_only=True)
     class Meta:
         model=Order
         fields='__all__'

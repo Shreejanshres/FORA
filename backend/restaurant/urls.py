@@ -3,6 +3,7 @@ from .views import *
 urlpatterns = [
     path('',login,name="login"),
     path('addtag/',addtags,name='addtags'),
+    path('displaytags/',displaytags,name='displaytags '),
     path('addmenu/',addmenu,name='addmenu'),
     path('viewmenu/',viewmenu,name='viewmenu'),
     path('display_headings/<int:id>/',display_headings,name='display_headings'),
@@ -17,4 +18,8 @@ urlpatterns = [
 
     #order
     path('order/',addtoorder,name='addtoorder'),
+    path('getorder/<int:id>/',getorderbyrestaurant,name='getorderbyrestaurant'),
+    path('updateorder/<int:id>/',update_order_status,name='update_order_status'),
+
 ]
+

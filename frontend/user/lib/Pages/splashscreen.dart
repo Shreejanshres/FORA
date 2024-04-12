@@ -26,13 +26,13 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _navigateAfterDelay() async {
     await Future.delayed(const Duration(seconds: 5));
     await _getUserLocation();
-    // After 5 seconds, check user data and navigate accordingly
     bool userDataExists = await checkUserDataExists();
     await _requestLocationPermission();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => userDataExists ? const Dashboard() : const LoginPage(),
+        builder: (context) =>
+            userDataExists ? const Dashboard() : const LoginPage(),
       ),
     );
   }
@@ -54,16 +54,19 @@ class _SplashScreenState extends State<SplashScreen> {
       openAppSettings();
     }
   }
+
   Future<void> _getUserLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       // Get address from coordinates
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude,position.longitude);
-      String userLocation='${placemarks[0].street},${placemarks[0].subLocality},${placemarks[0].locality}';
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      String userLocation =
+          '${placemarks[0].street},${placemarks[0].subLocality},${placemarks[0].locality}';
       var prefs = await SharedPreferences.getInstance();
-      prefs.setString('currentlocation',userLocation );
+      prefs.setString('currentlocation', userLocation);
     } catch (e) {
       print('Error getting location: $e');
     }
@@ -88,7 +91,6 @@ class _SplashScreenState extends State<SplashScreen> {
             'images/logo.svg', // Replace with your image URL
             width: 200,
             height: 200,
-
           ),
         ],
       ),

@@ -51,10 +51,24 @@ def addtags(request):
         return response(False,"The method should be POST")
 
 @csrf_exempt
+def displaytags(request):
+    if request.method=="GET":
+        try:
+            tags=Tags.objects.all()
+            serialized=TagSerializer(tags,many=True)
+            return JsonResponse(serialized.data,safe=False)
+        except:
+            return  response( False , "No tags found" )
+    else:
+        return response(False,"The method should be GET")
+
+@csrf_exempt
 def add_heading(request):
     if request.method == "POST":
         data_json = json.loads(request.body)
         print(data_json)
+        restro=RestaurantUser.objects.get(id=data_json.get("restaurant"))
+        data_json["restaurant"] = restro.id
         serializer = HeadingSerializer(data=data_json, many=False)
         if serializer.is_valid():
             serializer.save()
@@ -77,22 +91,33 @@ def display_headings(request, id):
         except Heading.DoesNotExist:
             return JsonResponse({"error": "No headings found for this restaurant"}, status=404)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+            return response(False, str(e))
     else:
-        return JsonResponse({"error": "The method should be GET"}, status=400)
+        return response(False, "The method should be GET")
 
 @csrf_exempt
 def addmenu(request):
-    if  request.method=='POST':
-        data_json=json.loads(request.body)
-        serializer=MenuSerializer(data=data_json,many=False)
-        if  serializer.is_valid():
-            serializer.save()
-            return response(True,"Menu added successfully")
-        else:
-            return  response(False,str(serializer.errors))
+    if request.method == 'POST':
+        try:
+            data_json = json.loads(request.body)
+            print("Received data:", data_json)
+
+            tags = Tags.objects.get(id=data_json.get("tags"))
+            heading = Heading.objects.get(id=data_json.get("heading"))
+            data_json["tag"] = tags.id
+            data_json["heading"] = heading.id
+            print("Processed data:", data_json)
+            serializer = MenuSerializer(data=data_json)
+            if serializer.is_valid():
+                serializer.save()
+                return response( True, "Menu added successfully")
+            else:
+                return response(False, str(serializer.errors))
+        except Exception as e:
+            print("Error processing request:", e)
+            return response(False, "An error occurred while processing the request")
     else:
-        return response(False,"The method should be POST")
+        return  response(False,"The method should be POST")
 
 @csrf_exempt
 def viewmenu(request):
@@ -319,3 +344,41 @@ def addtoorder(request):
     
     else:
         return JsonResponse({"success": False, "message": "The method should be POST"})
+
+# get order of a restaurant
+@csrf_exempt
+def getorderbyrestaurant(request, id):
+    if request.method == "GET":
+        try:
+            orders = Order.objects.filter(restaurant_id=id)
+            if orders.exists():
+                serialized = OrderSerializer(orders, many=True)
+                for order in serialized.data:
+                    user = CustomerUser.objects.get(id=order['user'])
+                    order['user'] = user.name
+                return JsonResponse({'success': True, 'orders': serialized.data})
+            else:
+                return JsonResponse({'success': False,"message": "No orders found for this restaurant"}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False,"message": str(e)}, status=500)
+    else:
+        return JsonResponse({'success': False,"message": "The method should be GET"}, status=405)
+    
+#update order status
+@csrf_exempt
+def update_order_status(request, id):
+    try:
+        order = Order.objects.get(id=id)
+        if request.method == 'PUT':
+            data = json.loads(request.body)
+            status = data.get('status')
+            if status is not None:
+                order.status = status
+                order.save()
+                return JsonResponse({'success': True, 'message': 'Order status updated successfully.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'Status is required.'}, status=400)
+        else:
+            return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
+    except Order.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Order not found.'}, status=404)

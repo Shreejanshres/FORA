@@ -107,7 +107,7 @@ const RestaurantItem = ({ isCollapsed, selected, setSelected }) => {
       />
       <Item
         title="Orders"
-        to="/restaurant/admin"
+        to="/restaurant/orders"
         icon={<AdminPanelSettingsIcon />}
         selected={selected}
         setSelected={setSelected}

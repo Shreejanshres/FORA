@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -15,35 +15,51 @@ import {
 import { tokens } from "../../../Theme";
 import styled from "@emotion/styled";
 import axios from "axios";
-const CustomTextField = styled(TextField)({});
-function AddRestaurant({ open, close, title, data }) {
+
+function AddMenu({ open, close, title, headings }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [itemname, setItemName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [tag, setTag] = useState("");
+  const [tag, setTag] = useState("veg");
   const [heading, setHeading] = useState("");
 
-  const handleSubmit = () => {
-    data = {
-      name: companyname,
-      ownername: ownername,
-      address: address,
-      phonenumber: phone,
-      email: email,
+  const [tags, setTags] = useState([]);
+  useEffect(() => {
+    const fetchtags = async () => {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8000/restaurant/displaytags/`
+        );
+        setTags(response.data);
+      } catch (error) {
+        console.error("Error fetching headings:", error);
+      }
     };
-    axios
-      .post("http://127.0.0.1:8000/admin/addrestaurant/", data)
-      .then((response) => {
-        console.log(response.data);
-        if (response.data["success"] === true) {
-          alert("Restaurant added successfully");
-          close();
-        }
-      });
-  };
+    fetchtags();
+  }, []);
 
+  const addmenuitem = async () => {
+    const data = {
+      item_name: itemname,
+      price: price,
+      tags: tag,
+      heading: heading,
+    };
+    console.log(data);
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/restaurant/addmenu/`,
+        data
+      );
+      console.log(response);
+      close();
+    } catch (error) {
+      console.error("Error adding menu item:", error);
+    }
+    window.location.reload();
+  };
   return (
     <Dialog open={open} onClose={close} fullWidth>
       <DialogTitle textAlign="center">
@@ -65,14 +81,6 @@ function AddRestaurant({ open, close, title, data }) {
             onChange={(e) => setItemName(e.target.value)}
           />
           <TextField
-            id="outlined-multiline-flexible"
-            label="Descrption"
-            multiline
-            maxRows={4}
-            fullWidth
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <TextField
             label="Price"
             fullWidth
             onChange={(e) => setPrice(e.target.value)}
@@ -80,16 +88,27 @@ function AddRestaurant({ open, close, title, data }) {
           <Select
             label="Tag"
             fullWidth
+            value={tag || ""}
             onChange={(e) => setTag(e.target.value)}
           >
-            <MenuItem value={"veg"}>Veg</MenuItem>
-            <MenuItem value={"non-veg"}>Non-Veg</MenuItem>
+            {tags.map((tagItem) => (
+              <MenuItem key={tagItem.id} value={tagItem.id}>
+                {tagItem.tag}
+              </MenuItem>
+            ))}
           </Select>
           <Select
             label="Heading"
             fullWidth
+            value={heading || ""}
             onChange={(e) => setHeading(e.target.value)}
-          />
+          >
+            {headings.map((headingItem) => (
+              <MenuItem key={headingItem.id} value={headingItem.id}>
+                {headingItem.heading_name}
+              </MenuItem>
+            ))}
+          </Select>
         </Box>
       </DialogContent>
       <DialogActions
@@ -103,7 +122,7 @@ function AddRestaurant({ open, close, title, data }) {
           sx={{
             backgroundColor: colors.blueAccent[500],
           }}
-          onClick={handleSubmit}
+          onClick={() => addmenuitem()}
         >
           Submit
         </Button>
@@ -112,4 +131,4 @@ function AddRestaurant({ open, close, title, data }) {
   );
 }
 
-export default AddRestaurant;
+export default AddMenu;

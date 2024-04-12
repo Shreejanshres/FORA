@@ -105,17 +105,6 @@ const menutable = ({ columns, data, onClick }) => {
               ))}
             </TableBody>
 
-            {/* <TableBody>
-              {data.map((row) => (
-                <TableRow key={row.id}>
-                  {columns.map((column) => (
-                    <TableCell key={column.field}>
-                      {row[column.field]}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody> */}
           </Table>
         </TableContainer>
       </Paper>

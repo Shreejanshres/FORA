@@ -12,7 +12,9 @@ class RestaurantUser(models.Model):
     picture=models.ImageField(upload_to='images/')
     coverphoto=models.ImageField(upload_to='coverphotos/')
     description=models.TextField(max_length=500)
-    open=models.BooleanField(default=True)
+    open=models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.name
     
@@ -35,7 +37,7 @@ class Heading(models.Model):
 class MenuItem(models.Model):
     item_name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    tags = models.ManyToManyField(Tags)
+    tag = models.ForeignKey(Tags, on_delete=models.CASCADE)
     heading = models.ForeignKey(Heading, on_delete=models.CASCADE)
 
     def __str__(self):
