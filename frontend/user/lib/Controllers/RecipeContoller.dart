@@ -13,7 +13,8 @@ class Recipe {
   List<String> directions = [];
   List<String> userNames = [];
   List<String> profileUrls = [];
-  String baseUrl='http://10.22.10.79:8000';
+  // String baseUrl='http://10.22.10.79:8000';
+  String baseUrl='http://192.168.1.66:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
   bool isLoading=true;
 

@@ -109,7 +109,7 @@ def updatepassword(request):
         email=data.get('email')
         if(CustomerUser.objects.filter(email=email).exists):
             data = CustomerUser.objects.get(email=email)
-            data.password = password
+            data.password = make_password(password)
             data.save()
             return JsonResponse({'success': True, 'message': 'Password changed successfully'})
         return JsonResponse("no user")

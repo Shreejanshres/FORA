@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:user/Controllers/UserController.dart';
 import 'package:user/Pages/validateotp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class ForgotPassword extends StatefulWidget {
@@ -12,7 +13,7 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   TextEditingController emailController=TextEditingController();
   String email='';
-
+  User user =new User();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,30 +22,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
-  void handleotp() async {
-    try {
-      var response = await Dio().post(
-        'https://fora-1.onrender.com/forgetpassword/',
-        data: {'email': email},
-      );
-      var responseData = response.data;
-      print(responseData['success']);
-      if (responseData['success']) {
-        var prefs = await SharedPreferences.getInstance();
-        prefs.setString('email', email);
-
-        // Use setState to trigger a rebuild of the UI after setting the email
-        setState(() {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const validateOtp()),
-          );
-        });
-      }
-    } catch (error) {
-      print("Error sending OTP: $error");
-    }
-  }
 
   Container body(){
     double screenHeight = MediaQuery.of(context).size.height;
@@ -72,14 +49,34 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async{
               email=emailController.text;
               print(email);
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => validateOtp()),
-              // );
-              handleotp();
+              var response =await user.forgetpassword(email);
+              print(response);
+              if(response['success']){
+                var prefs = await SharedPreferences.getInstance();
+                prefs.setString('email', email);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => validateOtp()),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(response['message']),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+              else{
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(response['message']),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+
             },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1565C0)),
             child: const Text('Send OTP',style: TextStyle(color: Colors.white),),

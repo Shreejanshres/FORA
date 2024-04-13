@@ -24,11 +24,14 @@ def login(request):
             user=RestaurantUser.objects.get(email=email)
             if check_password(password,user.password):
                 serialized=RestaurantUserSerializer(user,many=False)
-                request.session['data'] = serialized.data
                 payload = {"data": serialized.data}
-                request.session['data'] = serialized.data
+                request.session['data'] = payload
+                request.session['is_logged_in'] = True
                 token = jwt.encode(payload, "secret", algorithm="HS256")
-                return JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
+                response= JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
+                response.set_cookie('token', token)
+                response.set_cookie('is_logged_in', True)
+                return response
             else :  
                 return response(False,"password doesn't match")
         except:

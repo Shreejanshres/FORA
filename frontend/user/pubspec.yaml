@@ -45,6 +45,9 @@ dependencies:
   timeago: ^3.6.1
   provider: ^6.1.2
   image_picker: ^1.0.7
+  khalti: ^2.0.0
+  khalti_flutter: ^3.0.0
+
 
 
 dev_dependencies:

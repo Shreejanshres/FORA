@@ -143,24 +143,20 @@ class _BodyState extends State<Body> {
                     width: 100,
                     height: 35,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: ()  async {
                         email = emailController.text;
                         password = passwordController.text;
-                        // Navigator.pushReplacement(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => const Dashboard()),
-                        // );
-                        user.login(email, password);
-                        print(user.isLogged);
-                        if(user.isLogged){
+                        Map<String,dynamic> response= await user.login(email, password);
+                        if(response['success']){
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => const Dashboard()),
                           );
+                          print(response['message']);
                         }else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(user.errormessage),
+                              content: Text(response['message']),
                               duration: Duration(seconds: 3),
                             ),
                           );

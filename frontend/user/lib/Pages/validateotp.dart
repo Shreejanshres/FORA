@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:user/Pages/login.dart';
+import 'package:user/Controllers/UserController.dart';
+import 'package:user/Pages/changePassword.dart';
 
 class validateOtp extends StatefulWidget {
   const validateOtp({super.key});
@@ -13,7 +12,7 @@ class validateOtp extends StatefulWidget {
 class _validateOtpState extends State<validateOtp> {
   TextEditingController otpController = TextEditingController();
   String otp = '';
-
+  User user=new User();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,27 +21,7 @@ class _validateOtpState extends State<validateOtp> {
     );
   }
 
-  void validatation() async {
-    try {
-      var prefs = await SharedPreferences.getInstance();
-      var email = prefs.getString('email');
-      print('$email + $otp');
-      var response = await Dio().post(
-        'https://fora-1.onrender.com/validateotp/',
-        data: {'email': email, 'otp': otp},
-      );
-      var responseData = response.data;
-      print(responseData);
-      if (responseData['success']) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
-      }
-    } catch (error) {
-      print("Error sending otp: $error");
-    }
-  }
+
 
   Container body() {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -67,10 +46,15 @@ class _validateOtpState extends State<validateOtp> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async{
               otp = otpController.text;
-
-              validatation();
+              var response= await user.validatation(otp);
+              if (response['success']) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const changePassword()),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1565C0)),

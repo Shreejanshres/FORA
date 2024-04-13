@@ -20,7 +20,8 @@ class Post{
   List<Map<String, dynamic>> data = [];
   List<Map<String, dynamic>> commentdata = [];
   bool isLoading=true;
-  String baseUrl='http://10.22.10.79:8000';
+  // String baseUrl='http://10.22.10.79:8000';
+  String baseUrl='http://192.168.1.66:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
 
   Future<int?> getData()async {

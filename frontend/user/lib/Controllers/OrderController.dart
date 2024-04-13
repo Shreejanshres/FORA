@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:dio/dio.dart";
 class Order{
-  String baseUrl='http://10.22.10.79:8000';
+  // String baseUrl='http://10.22.10.79:8000';
+  String baseUrl='http://192.168.1.66:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
    List<dynamic> cartitem=[];
    String name='';
@@ -12,6 +13,7 @@ class Order{
   List<double> price = [];
   List<String> notes=[];
   double subtotal=0.0;
+  int cartid=0;
 
   Future<int?> getData()async {
     var prefs = await SharedPreferences.getInstance();
@@ -48,6 +50,7 @@ class Order{
     var response = await Dio().get('$baseUrl/restaurant/getcart/$userId/');
     print(response.data);
     if(response.data['success']){
+      cartid=response.data['cart']['id'];
       cartitem=response.data['cart']['cart_item'];
       for(int i=0;i<cartitem.length;i++){
         double priceValue = double.parse(cartitem[i]['item']['price']); // Parse as double
@@ -94,7 +97,7 @@ class Order{
   }
   Future<Map<String,dynamic>> getbill() async{
     int? userId = await getData();
-    var response= await Dio().get('http://10.22.10.79:8000/restaurant/getbill/$userId/');
+    var response= await Dio().get('$baseUrl/restaurant/getbill/$userId/');
     return response.data;
   }
 
@@ -110,5 +113,11 @@ class Order{
   };
   var response= await Dio().post('$baseUrl/restaurant/order/',data: jsonEncode(data));
   return response.data;
+  }
+
+  Future<Map<String,dynamic>> verifypayment(token,int amount )async{
+    print(token);
+    print(amount);
+    return {"data":"Hi"};
   }
 }

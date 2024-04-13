@@ -26,8 +26,12 @@ const Topbar = () => {
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // const token = localStorage.getItem("token");
+    // extract data from cookies
+    const token = document.cookie.split("=")[1];
     // Check if the token exists
+    const data = JSON.parse(atob(token.split(".")[1]));
+    console.log(data);
     if (token) {
       const data = JSON.parse(atob(token.split(".")[1]));
       setName(data.name);

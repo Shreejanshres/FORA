@@ -67,6 +67,10 @@ class _SplashScreenState extends State<SplashScreen> {
           '${placemarks[0].street},${placemarks[0].subLocality},${placemarks[0].locality}';
       var prefs = await SharedPreferences.getInstance();
       prefs.setString('currentlocation', userLocation);
+
+      print(userLocation);
+      print(prefs.getString('currentlocation'));
+
     } catch (e) {
       print('Error getting location: $e');
     }
