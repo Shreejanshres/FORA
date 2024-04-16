@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Backgroundfood from "../../assets/foodbackground.jpg";
@@ -35,7 +35,15 @@ const Login = () => {
     email: email,
     password: password,
   };
-
+  const setCookies = (name, value, days) => {
+    var expires = "";
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  };
   const HandleClick = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
     try {
@@ -44,7 +52,7 @@ const Login = () => {
         postdata
       );
       if (response.data.success) {
-        localStorage.setItem("token", response.data.message);
+        setCookies("token", response.data.message, 1);
         navigate("/admin/dashboard");
       } else {
         alert(response.data.message);
@@ -54,7 +62,14 @@ const Login = () => {
       // Handle the error, e.g., show an error message to the user
     }
   };
-
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      if (decoded.is_admin) {
+        navigate("/admin/dashboard");
+      }
+    }
+  }, [navigate]);
   return (
     <Box
       sx={{

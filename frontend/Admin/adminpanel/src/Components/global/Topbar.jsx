@@ -11,6 +11,8 @@ import {
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Switch } from "@mui/material";
+import FormControlLabel from "@mui/material/FormControlLabel";
 // import axios from "axios";
 import InputBase from "@mui/material/InputBase";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -25,30 +27,73 @@ const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+  const [is_restaurant, setIsRestaurant] = useState(false);
+
   useEffect(() => {
-    // const token = localStorage.getItem("token");
-    // extract data from cookies
-    const token = document.cookie.split("=")[1];
-    // Check if the token exists
-    const data = JSON.parse(atob(token.split(".")[1]));
-    console.log(data);
-    if (token) {
+    if (window.location.pathname.includes("/restaurant")) {
+      setIsRestaurant(true);
+    }
+    // Extract token from cookies
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+
+    // Check if token exists
+    if (tokenCookie) {
+      const token = tokenCookie.split("=")[1];
       const data = JSON.parse(atob(token.split(".")[1]));
-      setName(data.name);
+      console.log(data);
+      setName(data.data.name);
     }
   }, []);
 
   const handlelogout = () => {
-    localStorage.clear();
-
     if (window.location.pathname.includes("/admin")) {
       window.location.href = "/admin";
     } else {
       window.location.href = "/restaurant";
     }
   };
+
+  const handleUser = () => {
+    if (window.location.pathname.includes("/restaurant")) {
+      window.location.href = "/restaurant/profile";
+    }
+  };
+
+  const [isRestaurantOpen, setIsRestaurantOpen] = useState(false);
+
+  const handleOpen = async () => {
+    setIsRestaurantOpen(!isRestaurantOpen);
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+    if (tokenCookie) {
+      const token = tokenCookie.split("=")[1];
+      const data = JSON.parse(atob(token.split(".")[1]));
+      const id = data.data.id;
+      const response = await axios.put(
+        `http://127.0.0.1:8000/restaurant/updateopen/`,
+        {
+          id: id,
+          status: !isRestaurantOpen,
+        }
+      );
+      console.log(response);
+    }
+  };
   return (
     <Box display="flex" justifyContent="right" m={3} mb={0}>
+      {is_restaurant && (
+        <FormControlLabel
+          control={
+            <Switch
+              color="secondary"
+              onClick={handleOpen}
+              checked={isRestaurantOpen}
+            />
+          }
+          label="Open"
+        />
+      )}
       <IconButton onClick={colorMode.toggleColorMode} mr="4px">
         {theme.palette.mode === "dark" ? (
           <DarkModeOutlinedIcon sx={{ fontSize: "25px" }} />
@@ -56,13 +101,9 @@ const Topbar = () => {
           <LightModeOutlinedIcon sx={{ fontSize: "25px" }} />
         )}
       </IconButton>
-      <IconButton component={Link} to="/form">
-        <SettingsOutlinedIcon sx={{ fontSize: "25px" }} />
-      </IconButton>
       <IconButton component={Link} to="/faq">
         <Help sx={{ fontSize: "23px" }} />
       </IconButton>
-
       <FormControl variant="standard" value={name}>
         <Select
           value={name}
@@ -82,7 +123,7 @@ const Topbar = () => {
           }}
           input={<InputBase />}
         >
-          <MenuItem value={name}>
+          <MenuItem value={name} onClick={handleUser}>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -105,16 +146,6 @@ const Topbar = () => {
           <MenuItem onClick={handlelogout}>Log Out</MenuItem>
         </Select>
       </FormControl>
-      {/* <Box
-        component="img"
-        alt="profile-user"
-        height="50px"
-        width="50px"
-        borderRadius="50%"
-        sx={{ objectFit: "cover" }}
-        src={`src/assets/1.jpg`}
-        style={{ cursor: "pointer", borderRadius: "50%" }}
-      /> */}
     </Box>
   );
 };

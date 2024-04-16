@@ -1,18 +1,19 @@
 import { Box, TextField, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../../Theme.jsx";
 import Table from "../../global/table.jsx";
+import axios from "axios";
 import { alpha, styled } from "@mui/material/styles";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Popup from "./AddAdmin.jsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const columns = [
   { field: "id", headerName: "ID" },
   {
-    field: "restaurant",
-    headerName: "Restaurant  Name",
+    field: "name",
+    headerName: "Name",
     editable: true,
   },
   {
@@ -21,7 +22,7 @@ const columns = [
     editable: true,
   },
   {
-    field: "phone",
+    field: "phonenumber",
     headerName: "Phone",
     type: "number",
     editable: true,
@@ -30,11 +31,6 @@ const columns = [
     field: "email",
     headerName: "Email",
     type: "email",
-    editable: true,
-  },
-  {
-    field: "ownerName",
-    headerName: "Owner Name",
     editable: true,
   },
 ];
@@ -70,11 +66,26 @@ const CssTextField = styled(TextField)({
 const Restaurant = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+  const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const handleclose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    const getdata = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/admin/getadmins/"
+        );
+        console.log(response.data);
+        setRows(response.data);
+      } catch (error) {
+        console.error("Error fetching admins:", error);
+      }
+    };
+    getdata();
+  }, []);
 
   return (
     <Box ml={3} mr={5}>

@@ -55,10 +55,12 @@ const Restaurant = () => {
   const [restroid, setRestroid] = useState("");
 
   useEffect(() => {
-    var userdata = localStorage.getItem("token");
-    const tokenParts = userdata.split(".");
-    const decodedPayload = JSON.parse(atob(tokenParts[1]));
-    const restro = decodedPayload.data.id;
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+    const token = tokenCookie.split("=")[1];
+    const data = JSON.parse(atob(token.split(".")[1]));
+    console.log(data);
+    const restro = data.data.id;
     setRestroid(restro);
     const fetchData = async () => {
       try {
@@ -258,7 +260,12 @@ const Restaurant = () => {
 
           <AddIcon />
         </IconButton>
-        <Popup open={open} close={handleclose} title="Add Menu"  headings={headings}  />
+        <Popup
+          open={open}
+          close={handleclose}
+          title="Add Menu"
+          headings={headings}
+        />
       </Box>
       <Box m="20px 0 0 0">
         <Table columns={columns} data={rows} onClick={handleOpen} />

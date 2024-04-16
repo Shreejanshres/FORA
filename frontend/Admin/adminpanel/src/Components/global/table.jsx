@@ -75,13 +75,6 @@ const table = ({ columns, data }) => {
                     </TableCell>
                   ))}
                   <TableCell>
-                    {/* Edit IconButton */}
-                    <IconButton
-                      sx={{ color: "green" }}
-                      onClick={() => onEdit(row.id)}
-                    >
-                      <EditIcon />
-                    </IconButton>
                     {/* Delete IconButton */}
                     <IconButton
                       sx={{ color: "red" }}

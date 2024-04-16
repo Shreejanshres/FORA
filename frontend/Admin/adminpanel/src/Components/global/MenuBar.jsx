@@ -129,10 +129,16 @@ export default function MenuBar() {
   const [selected, setSelected] = useState("Dashboard");
   const [name, setName] = useState("");
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    // Extract token from cookies
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+
+    // Check if token exists
+    if (tokenCookie) {
+      const token = tokenCookie.split("=")[1];
       const data = JSON.parse(atob(token.split(".")[1]));
-      setName(data.data.ownername);
+      console.log(data.data.name);
+      setName(data.data.name);
     }
   }, []);
   return (

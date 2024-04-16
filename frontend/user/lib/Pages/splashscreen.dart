@@ -25,9 +25,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _navigateAfterDelay() async {
     await Future.delayed(const Duration(seconds: 5));
+    await _requestLocationPermission();
     await _getUserLocation();
     bool userDataExists = await checkUserDataExists();
-    await _requestLocationPermission();
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(

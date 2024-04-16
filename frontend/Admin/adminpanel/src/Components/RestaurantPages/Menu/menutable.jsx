@@ -11,11 +11,24 @@ import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
 
 const menutable = ({ columns, data, onClick }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const onDelete = async (id) => {
+    console.log(id);
+    try {
+      const response = await axios.delete(
+        `http://127.0.0.1:8000/restaurant/deletemenu/${id}/`
+      );
+      console.log(response);
+    } catch (error) {
+      console.error("Error deleting menu item:", error);
+    }
+    window.location.reload();
+  };
   return (
     <Box>
       <Paper
@@ -86,14 +99,6 @@ const menutable = ({ columns, data, onClick }) => {
                     </TableCell>
                   ))}
                   <TableCell>
-                    {/* Edit IconButton */}
-                    <IconButton
-                      sx={{ color: "green" }}
-                      onClick={() => onEdit(row.id)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    {/* Delete IconButton */}
                     <IconButton
                       sx={{ color: "red" }}
                       onClick={() => onDelete(row.id)}
@@ -104,7 +109,6 @@ const menutable = ({ columns, data, onClick }) => {
                 </TableRow>
               ))}
             </TableBody>
-
           </Table>
         </TableContainer>
       </Paper>

@@ -12,20 +12,45 @@ import {
 } from "@mui/material";
 import { tokens } from "../../../Theme";
 import styled from "@emotion/styled";
+import axios from "axios";
 
 const CustomTextField = styled(TextField)({});
 function AddRestaurant({ open, close, title, data }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [companyname, setCompanyName] = useState("");
-  const [ownername, setOwneryName] = useState("");
+  const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-
-  const handleSubmit = () => {
-    alert("This will close");
-    close();
+  const handleSubmit = async () => {
+    const data = {
+      name: name,
+      address: address,
+      phonenumber: phone,
+      email: email,
+    };
+    console.log(data);
+    try {
+      console.log(data);
+      const response = await axios.post(
+        "http://127.0.0.1:8000/admin/adminsignup/",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data.success);
+      if (response.data.success) {
+        alert("Restaurant added successfully");
+        close();
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      alert("Error:", error);
+    }
   };
 
   return (
@@ -46,22 +71,22 @@ function AddRestaurant({ open, close, title, data }) {
           <TextField
             label="Name"
             fullWidth
-            onChange={(e) => setCompanyName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
           />
           <TextField
             label="Address"
             fullWidth
-            onChange={(e) => setOwneryName(e.target.value)}
+            onChange={(e) => setAddress(e.target.value)}
           />
           <TextField
             label="Phone Number"
             fullWidth
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <TextField
             label="Email"
             fullWidth
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </Box>
       </DialogContent>

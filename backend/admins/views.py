@@ -18,6 +18,7 @@ from restaurant.serializers import RestaurantUserSerializer
 from django.core.serializers.json import DjangoJSONEncoder
 
 def response(success, message):
+    print(success, message)
     return JsonResponse({"success": success, "message": message})
 
 
@@ -26,17 +27,24 @@ def response(success, message):
 def adminsignup(request):
     if request.method == "POST":
         data_json = json.loads(request.body)
+        print(data_json)
         serializer = AdminUserSerializer(data=data_json)
         if serializer.is_valid():
-            user = serializer.save()
-            print(user)
-            # Hash the password before saving to the database
-            user.password = make_password(data_json['password'])
-            user.save()
+            random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+            hased_password = make_password(random_password)           
+            serializer.validated_data['password'] = hased_password
+            print(random_password,hased_password)
+            user=serializer.save()
+            subject = 'Creation of Account'
+            message = f'Welcome {user.name},\nYou can use your email: {user.email} and password:{random_password} for login. We encourage to change the password at first. Welcome to our team.'            
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [user.email]
+        # Send the email using Gmail
+            send_mail(subject, message, from_email,recipient_list, fail_silently=True)
             return response(True,"Signup Sucessful")
         else:
             # If the data is not valid, return the errors
-            return response(False,serializer.errors)
+            return response(False,serializer.errors)    
     else:
         return response(False,"The method should be POST")
 
@@ -60,7 +68,15 @@ def adminlogin(request):
     else:
         return response(False,"The method should be POST")
 
-
+@csrf_exempt
+def getadmins(request):
+    if request.method == 'GET':
+        alladmins = AdminUser.objects.all()
+        serialized = AdminUserSerializer(alladmins, many=True)
+        return JsonResponse(serialized.data, safe=False)
+    else:
+        return response(False,"The method should be GET")
+    
 
 
     
@@ -92,8 +108,10 @@ def addrestaurant(request):
 @csrf_exempt
 def getrestaurantdata(request):
     if request.method=="GET":
-        alldata= RestaurantUser.objects.all()
+        alldata= RestaurantUser.objects.filter(open=True)
         serialized_data = RestaurantUserSerializer(alldata,many=True)
         return JsonResponse(serialized_data.data,safe=False)
     else:
         return response(False,"The method should be GET")
+    
+

@@ -2,10 +2,12 @@ from django.urls import path
 from .views import *
 urlpatterns = [
     path('',login,name="login"),
+    path('updatepassword/',update_password,name='update_password'),
     path('addtag/',addtags,name='addtags'),
     path('displaytags/',displaytags,name='displaytags '),
     path('addmenu/',addmenu,name='addmenu'),
     path('viewmenu/',viewmenu,name='viewmenu'),
+    path ('deletemenu/<int:id>/',deletemenuitem,name='deletemenuitem'),
     path('display_headings/<int:id>/',display_headings,name='display_headings'),
     path('add_heading/',add_heading,name='add_heading'),
     # cart
@@ -20,6 +22,8 @@ urlpatterns = [
     path('order/',addtoorder,name='addtoorder'),
     path('getorder/<int:id>/',getorderbyrestaurant,name='getorderbyrestaurant'),
     path('updateorder/<int:id>/',update_order_status,name='update_order_status'),
+
+    path('updateopen/',changeopenstatus,name='changeopenstatus'),
 
 ]
 

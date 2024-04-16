@@ -11,7 +11,7 @@ from .serializers import *
 from django.db import IntegrityError
 
 
-def response(success, message):
+def customresponse(success, message):
     return JsonResponse({"success": success, "message": message})
 
 @csrf_exempt
@@ -25,20 +25,39 @@ def login(request):
             if check_password(password,user.password):
                 serialized=RestaurantUserSerializer(user,many=False)
                 payload = {"data": serialized.data}
-                request.session['data'] = payload
-                request.session['is_logged_in'] = True
+                is_active = payload.get("data").get("is_active")
                 token = jwt.encode(payload, "secret", algorithm="HS256")
-                response= JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
+                response= JsonResponse({"success": True, "message": token,"is_active":is_active}, encoder=DjangoJSONEncoder)
                 response.set_cookie('token', token)
                 response.set_cookie('is_logged_in', True)
                 return response
             else :  
-                return response(False,"password doesn't match")
+                return JsonResponse({"success": False, "message": "Invalid password"})
         except:
-            return response(False,"User with given email doesn't exist")
+            return JsonResponse({"success": False, "message": "User not found"})
     else:
-        return response(False,"The method should be POST")
-    
+        return JsonResponse({"success": False, "message": "The method should be POST"})
+@csrf_exempt
+def update_password(request):
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        email = data.get("email")
+        old_password = data.get("old_password")
+        new_password = data.get("new_password")
+        try:
+            user = RestaurantUser.objects.get(email=email)
+            if check_password(old_password, user.password):
+                user.password = make_password(new_password)
+                user.is_active = True
+                user.save()
+                return JsonResponse({"success": True, "message": "Password updated successfully"})
+            else:
+                return JsonResponse({"success": False, "message": "Invalid old password"})
+        except RestaurantUser.DoesNotExist:
+            return JsonResponse({"success": False, "message": "User not found"})
+    else:
+        return JsonResponse({"success": False, "message": "The method should be PUT"})
+
 @csrf_exempt
 # only by admin
 def addtags(request):
@@ -47,11 +66,11 @@ def addtags(request):
         serializer=TagSerializer(data=data_json,many=False)
         if  serializer.is_valid():
             serializer.save()
-            return response(True,"Tags added successfully")
+            return JsonResponse({"success":True,"message":"Tags added successfully"})
         else:
-            return  response(False,str(serializer.errors))
+            return JsonResponse({"success":False,"message":str(serializer.errors)})
     else:
-        return response(False,"The method should be POST")
+        return JsonResponse({"success":False,"message":"The method should be POST"})
 
 @csrf_exempt
 def displaytags(request):
@@ -61,9 +80,9 @@ def displaytags(request):
             serialized=TagSerializer(tags,many=True)
             return JsonResponse(serialized.data,safe=False)
         except:
-            return  response( False , "No tags found" )
+            return  JsonResponse({"success":False,"message":"No tags found"})
     else:
-        return response(False,"The method should be GET")
+        return JsonResponse({"success":False,"message":"The method should be GET"})
 
 @csrf_exempt
 def add_heading(request):
@@ -75,11 +94,11 @@ def add_heading(request):
         serializer = HeadingSerializer(data=data_json, many=False)
         if serializer.is_valid():
             serializer.save()
-            return response(True, "Heading added successfully")
+            return JsonResponse({"success": True, "message": "Heading added successfully"})
         else:
-            return response(False, str(serializer.errors))
+            return JsonResponse({"success": False, "message": str(serializer.errors)})
     else:
-        return response(False, "The method should be POST")
+        return JsonResponse({"success": False, "message": "The method should be POST"})
         
 @csrf_exempt
 def display_headings(request, id):
@@ -94,9 +113,9 @@ def display_headings(request, id):
         except Heading.DoesNotExist:
             return JsonResponse({"error": "No headings found for this restaurant"}, status=404)
         except Exception as e:
-            return response(False, str(e))
+            return  JsonResponse({"success": False, "message": str(e)})
     else:
-        return response(False, "The method should be GET")
+        return JsonResponse({"success": False, "message": "The method should be GET"})
 
 @csrf_exempt
 def addmenu(request):
@@ -113,14 +132,14 @@ def addmenu(request):
             serializer = MenuSerializer(data=data_json)
             if serializer.is_valid():
                 serializer.save()
-                return response( True, "Menu added successfully")
+                return  JsonResponse({"success": True, "message": "Menu added successfully"})
             else:
-                return response(False, str(serializer.errors))
+                return JsonResponse({"success": False, "message": str(serializer.errors)})
         except Exception as e:
             print("Error processing request:", e)
-            return response(False, "An error occurred while processing the request")
+            return JsonResponse({"success": False, "message": str(e)})
     else:
-        return  response(False,"The method should be POST")
+        return JsonResponse({"success": False, "message": "The method should be POST"})
 
 @csrf_exempt
 def viewmenu(request):
@@ -133,9 +152,9 @@ def viewmenu(request):
             serialized=MenuSerializer(menuitem,many=True)
             return  JsonResponse(serialized.data,safe=False)
         except:
-            return  response( False , "No Menu found for this restaurant" )
+            return JsonResponse({"success":False,"message":"No menu found"})
     else:
-        return response(False,"The method should be GET")
+        return JsonResponse({"success":False,"message":"The method should be GET"})
     
 @csrf_exempt
 def getcart(request, id):
@@ -232,11 +251,24 @@ def delete(request,id):
         try:
             cart=Cartitem.objects.get(id=id)
             cart.delete()
-            return response(True,"Cart deleted successfully")
+            return JsonResponse({"success":True,"message":"Cart deleted successfully"})
         except:
-            return response(False,"Cart not found")
+            return JsonResponse({"success":False,"message":"Cart not found"})
     else:
-        return response(False,"The method should be DELETE")
+        return JsonResponse({"success":False,"message":"The method should be DELETE"})
+    
+@csrf_exempt
+def deletemenuitem(request,id):
+    if request.method == "DELETE":
+        try:
+            menuitem = MenuItem.objects.get(id=id)
+            menuitem.delete()
+            return JsonResponse({"success": True, "message": "Menu item deleted successfully"})
+        except MenuItem.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Menu item not found"})
+    else:
+        return JsonResponse({"success": False, "message": "The method should be DELETE"})
+
 @csrf_exempt
 def update(request):
     if request.method == "PUT":
@@ -286,9 +318,9 @@ def getbill(request,id):
             print(total)
             return JsonResponse({"success": True, "message": {"subtotal": subtotal, "delivery_charge": delivery_charge, "tax": tax, "total": total}})
         except:
-            return  response( False , "No Cart found for this user" )
+            return  JsonResponse({"success": False, "message": "No cart found"})
     else:
-        return response(False,"The method should be GET")
+        return JsonResponse({"success": False, "message": "The method should be GET"})
 
 @csrf_exempt
 def getrestro(id):
@@ -385,3 +417,23 @@ def update_order_status(request, id):
             return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
     except Order.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Order not found.'}, status=404)
+    
+
+@csrf_exempt
+def changeopenstatus(request):
+    if request.method=="PUT":
+        data=json.loads(request.body)
+        id=data.get("id")
+        status=data.get("status")
+        print(id,status)
+        try:
+            restro=RestaurantUser.objects.get(id=id)
+            restro.open=status
+            restro.save()
+            return JsonResponse({"success":True,"message":"Status changed successfully"})
+        except:
+            return JsonResponse({"success":False,"message":"Restaurant not found"})
+    else:
+        return JsonResponse({"success":False,"message":"The method should be PUT"})
+    
+

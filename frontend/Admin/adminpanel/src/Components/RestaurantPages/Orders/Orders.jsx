@@ -39,10 +39,12 @@ export default function Orders() {
 
   useEffect(() => {
     const getOrders = () => {
-      const userData = localStorage.getItem("token");
-      const tokenParts = userData.split(".");
-      const decodedPayload = JSON.parse(atob(tokenParts[1]));
-      const restroId = decodedPayload.data.id;
+      const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+      const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+      const token = tokenCookie.split("=")[1];
+      const data = JSON.parse(atob(token.split(".")[1]));
+      console.log(data);
+      const restroId = data.data.id;
       axios
         .get(`http://127.0.0.1:8000/restaurant/getorder/${restroId}/`)
         .then((response) => {

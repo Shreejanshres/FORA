@@ -32,10 +32,9 @@ function AddRestaurant({ open, close, title, data }) {
       email: email,
     };
     axios
-      .post("http://fora-1.onrender.com/admin/addrestaurant/", data, {
+      .post("http://127.0.0.1:8000/admin/addrestaurant/", data, {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:5173", 
         },
       })
       .then((response) => {

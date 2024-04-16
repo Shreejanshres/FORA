@@ -49,8 +49,13 @@ const Login = () => {
         postdata
       );
       if (response.data.success) {
-        setCookies("token", response.data.message, 1);
-        navigate("/restaurant/dashboard");
+        if (response.data.is_active) {
+          setCookies("token", response.data.message, 1);
+          navigate("/restaurant/dashboard");
+        } else {
+          alert(email);
+          navigate("/restaurant/changepassword", { state: { email } });
+        }
       } else {
         alert(response.data.message);
       }
@@ -60,7 +65,12 @@ const Login = () => {
     }
   };
 
-
+  useEffect(() => {
+    const token = document.cookie.split("=")[1];
+    if (token) {
+      navigate("/restaurant/dashboard");
+    }
+  }, [navigate]);
   return (
     <Box
       sx={{

@@ -7,6 +7,6 @@ class AdminUser(models.Model):
     address = models.CharField()
     phonenumber = models.CharField()
     picture = models.ImageField(upload_to='admins/')
-
+    is_active=models.BooleanField(default=False)
     def __str__(self):
         return self.name
