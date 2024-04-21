@@ -28,6 +28,7 @@ const Topbar = () => {
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const [is_restaurant, setIsRestaurant] = useState(false);
+  const [isRestaurantOpen, setIsRestaurantOpen] = useState(false);
 
   useEffect(() => {
     if (window.location.pathname.includes("/restaurant")) {
@@ -36,12 +37,14 @@ const Topbar = () => {
     // Extract token from cookies
     const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
     const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
-
+    const token = tokenCookie.split("=")[1];
+    const data = JSON.parse(atob(token.split(".")[1]));
+    setIsRestaurantOpen(data.data.open);
+    console.log(tokenCookie);
     // Check if token exists
     if (tokenCookie) {
       const token = tokenCookie.split("=")[1];
       const data = JSON.parse(atob(token.split(".")[1]));
-      console.log(data);
       setName(data.data.name);
     }
   }, []);
@@ -60,15 +63,23 @@ const Topbar = () => {
     }
   };
 
-  const [isRestaurantOpen, setIsRestaurantOpen] = useState(false);
-
+  const setCookies = (name, value, days) => {
+    var expires = "";
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  };
   const handleOpen = async () => {
-    setIsRestaurantOpen(!isRestaurantOpen);
     const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
     const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+    const token = tokenCookie.split("=")[1];
+    const data = JSON.parse(atob(token.split(".")[1]));
+    setIsRestaurantOpen(!isRestaurantOpen);
+
     if (tokenCookie) {
-      const token = tokenCookie.split("=")[1];
-      const data = JSON.parse(atob(token.split(".")[1]));
       const id = data.data.id;
       const response = await axios.put(
         `http://127.0.0.1:8000/restaurant/updateopen/`,
@@ -77,7 +88,9 @@ const Topbar = () => {
           status: !isRestaurantOpen,
         }
       );
-      console.log(response);
+      if (response.data.success) {
+        setCookies("token", response.data.token, 1);
+      }
     }
   };
   return (

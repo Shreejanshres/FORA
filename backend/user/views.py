@@ -386,3 +386,32 @@ def delete_follow(request, id):
     else:
         return JsonResponse({"success":False,"message":"The request should be DELETE"})
     
+@csrf_exempt
+def updatepic(request):
+    if request.method == 'POST':
+        try:
+            # Retrieve data from the request
+            print(request.body)
+            data = json.loads(request.body)
+            user_id = data.get('id')
+            image_data = data.get('image')
+            print(user_id,image_data)
+
+            # Fetch the user object
+            user = CustomerUser.objects.get(id=user_id)
+
+            # Decode the base64 image data
+            image_binary = base64.b64decode(image_data)
+
+            # Save the image to a temporary file
+            temp_image_name = 'temp_image.jpg'
+            temp_image_file = ContentFile(image_binary, name=temp_image_name)
+
+            # Assign the image to the user's profile_pic field
+            user.profile_pic.save(temp_image_name, temp_image_file, save=True)
+
+            return JsonResponse({"success": True, "message": "Profile picture updated successfully"})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Error: {str(e)}"})
+    else:
+        return JsonResponse({"success": False, "message": "The request should be POST"})

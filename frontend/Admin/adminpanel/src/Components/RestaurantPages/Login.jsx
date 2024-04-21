@@ -61,12 +61,14 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      // Handle the error, e.g., show an error message to the user
     }
   };
 
   useEffect(() => {
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
     const token = document.cookie.split("=")[1];
+    
     if (token) {
       navigate("/restaurant/dashboard");
     }

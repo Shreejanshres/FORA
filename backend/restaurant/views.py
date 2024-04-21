@@ -20,6 +20,8 @@ def login(request):
         data_json = json.loads(request.body)
         email= data_json.get("email")
         password = data_json.get("password")
+        print(password)
+
         try:
             user=RestaurantUser.objects.get(email=email)
             if check_password(password,user.password):
@@ -425,15 +427,31 @@ def changeopenstatus(request):
         data=json.loads(request.body)
         id=data.get("id")
         status=data.get("status")
-        print(id,status)
         try:
             restro=RestaurantUser.objects.get(id=id)
             restro.open=status
             restro.save()
-            return JsonResponse({"success":True,"message":"Status changed successfully"})
+            restro = RestaurantUser.objects.get(id=id)
+            serialized = RestaurantUserSerializer(restro, many=False)
+            payload = {"data": serialized.data}
+            token = jwt.encode(payload, "secret", algorithm="HS256")
+            return JsonResponse({"success":True,"message": "Status changed successfully","token":token}, encoder=DjangoJSONEncoder)
         except:
             return JsonResponse({"success":False,"message":"Restaurant not found"})
     else:
         return JsonResponse({"success":False,"message":"The method should be PUT"})
     
-
+@csrf_exempt
+def updaterestro(request,id):
+    if request.method=="PUT":
+        data=json.loads(request.body)
+        try:
+            restro=RestaurantUser.objects.get(id=id)
+            serializer=RestaurantUpdateSerializer(restro,data=data,many=False)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({"success":True,"message":"Restaurant updated successfully"})
+            else:
+                return JsonResponse({"success":False,"message":str(serializer.errors)})
+        except:
+            return JsonResponse({"success":False,"message":"Restaurant not found"})

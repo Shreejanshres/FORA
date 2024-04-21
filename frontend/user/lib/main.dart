@@ -6,6 +6,7 @@ import 'package:user/PostSystem/postpage.dart';
 import 'package:user/RestaurantSystem/ItemPage.dart';
 import 'package:user/RestaurantSystem/restaurantpage.dart';
 import 'package:provider/provider.dart';
+import 'package:user/Settings/UserProfile.dart';
 import 'package:user/Theme/Theme.dart';
 import 'package:user/Pages/splashscreen.dart';
 import 'package:geocoding/geocoding.dart';
@@ -24,26 +25,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   return KhaltiScope(publicKey:'test_public_key_3026c03dc8bf4d859d62561b3d70a878',
-       enabledDebugging: true,
-       builder:(context,navigatorKey){
-         return MaterialApp(
-           theme: Provider.of<ThemeProvider>(context).themeData,
-           debugShowCheckedModeBanner: false,
-           home: const SplashScreen(),
-           routes: {
-             '/splashscreen': (context) => const SplashScreen(),
-             '/restaurantpage': (context) => const RestaurantPage(),
-             '/detailrestaurant': (context) => const DetailRecipe(),
-             '/itempage': (context) => const ItemPage(),
-             '/detailpost': (context) => const postPage(),
-             '/information': (context) => const informationpage(),
-           },
-           navigatorKey: navigatorKey,
-           localizationsDelegates: const [
-             KhaltiLocalizations.delegate
-           ],
-         );
-       });
+    return KhaltiScope(
+        publicKey: 'test_public_key_3026c03dc8bf4d859d62561b3d70a878',
+        enabledDebugging: true,
+        builder: (context, navigatorKey) {
+          return MaterialApp(
+            theme: Provider.of<ThemeProvider>(context).themeData,
+            debugShowCheckedModeBanner: false,
+            home: const SplashScreen(),
+            routes: {
+              '/splashscreen': (context) => const SplashScreen(),
+              '/restaurantpage': (context) => const RestaurantPage(),
+              '/detailrestaurant': (context) => const DetailRecipe(),
+              '/itempage': (context) => const ItemPage(),
+              '/detailpost': (context) => const postPage(),
+              '/information': (context) => const informationpage(),
+              '/editprofile': (context) => const userProfile(),
+            },
+            navigatorKey: navigatorKey,
+            localizationsDelegates: const [KhaltiLocalizations.delegate],
+          );
+        });
   }
 }

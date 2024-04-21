@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class User{
   // String baseUrl='http://10.22.10.79:8000';
@@ -79,4 +80,24 @@ class User{
     return responseData;
   }
 
+  Future<Map<String,dynamic>> updatepic(data) async{
+    print(data);
+    var response = await Dio().post(
+      '$baseUrl/updatepicture/',
+      data:data ,
+    );
+    var responseData = response.data;
+    print(responseData);
+    return responseData;
+  }
 }
+
+pickImage(ImageSource source) async{
+  final ImagePicker _imagePicker = ImagePicker();
+  XFile? _file = await _imagePicker.pickImage(source: source);
+  if(_file != null){
+    return await _file.readAsBytes();
+  }
+  print(" no Image Selected");
+}
+

@@ -4,10 +4,13 @@ import HandshakeIcon from "@mui/icons-material/Handshake";
 import PeopleIcon from "@mui/icons-material/People";
 
 import { tokens } from "../../Theme";
-import React from "react";
+import React, { useEffect } from "react";
 const Data = ({ title, value, icon: IconComponent }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+  const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+  const token = tokenCookie.split("=")[1];
   return (
     <Box
       display="flex"

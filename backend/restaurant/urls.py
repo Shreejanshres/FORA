@@ -24,6 +24,6 @@ urlpatterns = [
     path('updateorder/<int:id>/',update_order_status,name='update_order_status'),
 
     path('updateopen/',changeopenstatus,name='changeopenstatus'),
-
+    path('updaterestro/',updaterestro,name='updaterestro'),
 ]
 

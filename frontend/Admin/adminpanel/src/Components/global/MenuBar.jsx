@@ -137,7 +137,6 @@ export default function MenuBar() {
     if (tokenCookie) {
       const token = tokenCookie.split("=")[1];
       const data = JSON.parse(atob(token.split(".")[1]));
-      console.log(data.data.name);
       setName(data.data.name);
     }
   }, []);

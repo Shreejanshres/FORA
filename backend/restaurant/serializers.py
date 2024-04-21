@@ -80,5 +80,8 @@ class OrderSerializer(serializers.ModelSerializer):
         model=Order
         fields='__all__'
 
-
+class RestaurantUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=RestaurantUser
+        fields=['picture','coverphoto','delivery_time','description']
     

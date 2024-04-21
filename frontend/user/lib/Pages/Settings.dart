@@ -45,7 +45,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget body(String data) {
-    String baseUrl = 'https://shreejan.pythonanywhere.com';
+    // String baseUrl = 'https://shreejan.pythonanywhere.com';
+    String baseUrl = 'http://192.168.1.66:8000';
     return Container(
       width: double.infinity,
       child: Column(
@@ -60,7 +61,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       image: data != 'no data'
-                          ? NetworkImage('$baseUrl$data') as ImageProvider<Object>
+                          ? NetworkImage('$baseUrl$data')
+                              as ImageProvider<Object>
                           : AssetImage('images/defaultimage.png'),
                       fit: BoxFit.cover,
                     ),
@@ -68,9 +70,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 SizedBox(height: 10),
                 OutlinedButton(
-                  onPressed: () {},
-
-                  child: Text("Edit Profile",),
+                  onPressed: () {
+                    Navigator.pushNamed(context,'/editprofile');
+                  },
+                  child: Text(
+                    "Edit Profile",
+                  ),
                 )
               ],
             ),
@@ -112,7 +117,8 @@ class _SettingsPageState extends State<SettingsPage> {
             activeColor: Colors.grey.shade600,
             onChanged: (bool value) {
               setState(() {
-                Provider.of<ThemeProvider>(context,listen: false).toggleTheme();
+                Provider.of<ThemeProvider>(context, listen: false)
+                    .toggleTheme();
                 light = value;
               });
             },

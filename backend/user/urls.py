@@ -6,6 +6,7 @@ urlpatterns = [
     path('forgetpassword/',forgetpassword,name="forgetpassword"),
     path('validateotp/',validate_otp,name="validate_otp"),
     path("updatepassword/",updatepassword,name="updatepassword"),
+    path('updatepicture/',updatepic,name="updatepic"),
 
     path("addrecipe/",add_recipe,name="aadd_recipe"),
     path("getrecipe/",get_recipe,name="get_recipe"),
