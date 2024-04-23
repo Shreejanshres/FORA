@@ -10,38 +10,102 @@ class DetailRecipe extends StatefulWidget {
 }
 
 class _DetailRecipeState extends State<DetailRecipe> {
-  late Recipe recipe;
+  Recipe recipe = Recipe();
   bool isLoading = true;
+  Map<String, dynamic> data = {};
+  late int id;
+  bool isfollowed=false;
+  bool issame=false;
 
+
+// String baseUrl = 'http://10.22.10.79:8000';
+  String baseUrl='http://192.168.1.66:8000';
+  // String baseUrl = 'http://shreejan.pythonanywhere.com';
+  // String baseUrl='http://192.168.1.116:8000';
 
   @override
-  void initState() {
-    super.initState();
-    fetchRecipe();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Access ModalRoute.of(context) here
+    id = ModalRoute.of(context)?.settings.arguments as int;
+    fetchRecipe(id);
   }
 
-  Future<void> fetchRecipe() async {
-    recipe = Recipe(); // Initialize the Recipe instance
-    await recipe.getRecipe();
-    setState(() {
-      isLoading = false;
-    });
+  Future<void> fetchRecipe(int id) async {
+    try {
+      var response = await recipe.getrecipebyid(id);
+      print(response['message']);
+      setState(() {
+        data = response['message'];
+      });
+    } catch (e) {
+      print("Error fetching recipe: $e");
+      // Handle error gracefully
+      setState(() {
+        isLoading = false;
+      });
+    }
+    checkfollow();
+    checksameuser();
   }
-
+  Future<void> checkfollow() async {
+    try {
+      var response = await recipe.checkfollower(data['user']);
+      print(response);
+      if(response['message']){
+        setState(() {
+          isfollowed=true;
+          isLoading = false;
+        });
+      }
+      else{
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching recipe: $e");
+      // Handle error gracefully
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  Future<void> checksameuser() async {
+    try {
+      var response = await recipe.checkifsameuser(data['user']);
+      if(response) {
+        setState(() {
+          issame=true;
+          isLoading = false;
+        });
+      }
+      else{
+        setState(() {
+          issame=false;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching recipe: $e");
+      // Handle error gracefully
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    final int index = ModalRoute.of(context)?.settings.arguments as int;
-
     return Scaffold(
       appBar: AppBar(
-        title: isLoading ? Text('Loading...') : Text(recipe.titles[index]),
+        title: isLoading ? Text('Loading...') : Text(data['title'] ?? 'Recipe Title'),
         centerTitle: true,
       ),
-      body: isLoading ? Center(child: CircularProgressIndicator()) : body(index),
+      body: isLoading? CircularProgressIndicator() : body(),
     );
   }
 
-  Widget body(int index) {
+  Widget body() {
     return SingleChildScrollView(
       child: Container(
         padding: EdgeInsets.all(15),
@@ -51,7 +115,7 @@ class _DetailRecipeState extends State<DetailRecipe> {
             Container(
               width: double.infinity,
               height: 300,
-              child: Image.network(recipe.imageUrls[index],fit: BoxFit.cover,),
+              child: Image.network("$baseUrl${data['image']} ", fit: BoxFit.cover)
             ),
             SizedBox(height: 5,),
             Row(
@@ -62,7 +126,8 @@ class _DetailRecipeState extends State<DetailRecipe> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: NetworkImage(recipe.profileUrls[index]),
+                      image: data['profile_pic'] != null ? NetworkImage("$baseUrl${data['profile_pic']}") as ImageProvider<Object> : AssetImage('images/defaultimage.png'),
+
                       fit: BoxFit.cover,
 
                     ),
@@ -72,7 +137,7 @@ class _DetailRecipeState extends State<DetailRecipe> {
                   width: 15,
                 ),
                 Text(
-                  recipe.userNames[index],
+                  "${data['username']}",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -81,7 +146,7 @@ class _DetailRecipeState extends State<DetailRecipe> {
               ],
             ),
             SizedBox(height: 5,),
-            Text(recipe.descriptions[index],
+            Text('${data['description']}',
               style: TextStyle(
                 fontSize: 15,
               ),
@@ -95,7 +160,7 @@ class _DetailRecipeState extends State<DetailRecipe> {
               ) ,
               ),
             ),
-            Text(recipe.ingredients[index]),
+            Text("${data["ingredients"]}"),
             Divider(thickness: 2),
             Center(
               child: Text("Directions",
@@ -105,59 +170,89 @@ class _DetailRecipeState extends State<DetailRecipe> {
                 ) ,
               ),
             ),
-            Text(recipe.directions[index]),
+            Text("${data['directions']}"),
             Divider(thickness: 2),
-            Center(
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage(recipe.profileUrls[index]),
-                    fit: BoxFit.cover,
-
-                  ),
-                ),
-              ),
-            ),
-            Row(
-              mainAxisAlignment:MainAxisAlignment.center,
+            issame ? SizedBox(height: 5,): Container(
+              child: Column(
                 children: [
-                  Text("Created by"),
-                  SizedBox(width: 2,),
-                  Text(
-                    recipe.userNames[index],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                  Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: data['profile_pic'] != null ? NetworkImage("$baseUrl${data['profile_pic']}") as ImageProvider<Object> : AssetImage('images/defaultimage.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
+
+                  Row(
+                    mainAxisAlignment:MainAxisAlignment.center,
+                    children: [
+                      Text("Created by"),
+                      SizedBox(width: 2,),
+                      Text(
+                        "${data['username']}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
+                  ElevatedButton(
+                        onPressed: () async {
+                          var response;
+                          if (isfollowed) {
+                            response = await recipe.deletefollower(data['user']);
+                          } else {
+                            response = await recipe.follow(data['user']);
+                          }
+                          print(response);
+                          if (response['success']) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(response['message']),
+                              ),
+                            );
+                            setState(() {
+                              isfollowed=!isfollowed;
+                            });
+
+
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Error "),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          isfollowed ? 'Followed' : 'Follow',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>( isfollowed ? Colors.grey : Color(0xFFED4A25)),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0), // Set the border radius
+                              side: BorderSide(color: Colors.transparent), // Add a slight border
+                            ),
+                          ),
+                          minimumSize: MaterialStateProperty.all<Size>(
+                            Size(150, 40), // Set the width to double.infinity and height to 50
+                          ),
+                        ),
+                      )
+
                 ],
               ),
-            Center(
-              child:
-              ElevatedButton(
-                onPressed: (){
-
-                },
-                child: Text("Follow",style: TextStyle(color: Colors.white)),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFED4A25)),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // Set the border radius
-                      side: BorderSide(color: Colors.transparent), // Add a slight border
-                    ),
-                  ),
-                  minimumSize: MaterialStateProperty.all<Size>(
-                    Size(150, 40), // Set the width to double.infinity and height to 50
-                  ),
-              ),
-              )
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
+

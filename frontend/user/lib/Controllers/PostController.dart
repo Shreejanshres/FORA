@@ -22,6 +22,7 @@ class Post{
   bool isLoading=true;
   // String baseUrl='http://10.22.10.79:8000';
   String baseUrl='http://192.168.1.66:8000';
+  // String baseUrl='http://192.168.1.66:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
 
   Future<int?> getData()async {
@@ -95,6 +96,15 @@ class Post{
       }
     }
   }
+  Future<Map<String,dynamic>> getpostbyid(id) async{
+    var response = await Dio().get(
+      '$baseUrl/getpostbyid/${id}',
+    );
+    var responseData = response.data;
+    print(responseData);
+    return responseData;
+  }
+
 
   Future<Map<String, dynamic>> addPost(String jsonData) async {
     int? userId = await getData(); // Assuming this function retrieves the user ID
@@ -118,7 +128,47 @@ class Post{
       throw e;
     }
   }
+  Future<Map<String,dynamic>> checkliked(postid) async{
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    var postdata={
+      "post":postid,
+      "user":userId,
+    };
+    print(postdata);
+    var response = await Dio().get(
+        '$baseUrl/isliked/',
+        data: postdata
+    );
+    var responseData = response.data;
+    return responseData;
+  }
 
+  Future<Map<String,dynamic>> like(postid) async{
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    var postdata={
+      "post":postid,
+      "user":userId,
+    };
+    var response = await Dio().post(
+        '$baseUrl/addlike/',
+        data: postdata
+    );
+    var responseData = response.data;
+    return responseData;
+  }
+  Future<Map<String,dynamic>> deletelike(postid) async{
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    var postdata={
+      "post":postid,
+      "user":userId,
+    };
+    var response = await Dio().delete(
+        '$baseUrl/deletelike/',
+        data: postdata
+    );
+    var responseData = response.data;
+    return responseData;
+  }
 }
 pickImage(ImageSource source) async{
   final ImagePicker _imagePicker = ImagePicker();

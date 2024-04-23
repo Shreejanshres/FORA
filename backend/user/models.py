@@ -54,10 +54,10 @@ class Like(models.Model):
         unique_together = ('user', 'post')
 
 class Follow(models.Model):
-    follower = models.ForeignKey(CustomerUser, related_name='following', on_delete=models.CASCADE)
-    following = models.ForeignKey(CustomerUser, related_name='followers', on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomerUser, related_name='following', on_delete=models.CASCADE)
+    following = models.ForeignKey(CustomerUser, related_name='user', on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('follower', 'following')
+        unique_together = ('user', 'following')
 
 

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class User{
   // String baseUrl='http://10.22.10.79:8000';
   String baseUrl='http://192.168.1.66:8000';
+  // String baseUrl='http://192.168.1.116:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
   Future<Map<String,dynamic>> login(email,password)async{
       var response = await Dio().post(
@@ -81,14 +82,51 @@ class User{
   }
 
   Future<Map<String,dynamic>> updatepic(data) async{
-    print(data);
     var response = await Dio().post(
       '$baseUrl/updatepicture/',
       data:data ,
     );
     var responseData = response.data;
-    print(responseData);
+    if(responseData['success']){
+      await saveUserDataToSharedPreferences(responseData['data']);
+    }
     return responseData;
+  }
+
+  Future<int> getfollowers(id) async{
+    var response = await Dio().get(
+      '$baseUrl/getfollow/${id}',
+    );
+    var responseData = response.data;
+    List<dynamic> message= responseData['message'];
+    print('Variable type of message: ${message.runtimeType}');
+    return message.length;
+  }
+
+  Future<int> getfollowing(id) async{
+    var response = await Dio().get(
+      '$baseUrl/getfollowing/${id}',
+    );
+    var responseData = response.data;
+    List<dynamic> message= responseData['message'];
+    print('Variable type of message: ${message.runtimeType}');
+    return message.length;
+  }
+  Future<List<dynamic>> getpostbyuser(id) async{
+    var response = await Dio().get(
+      '$baseUrl/getpostbyuser/${id}',
+    );
+    var responseData = response.data;
+    List<dynamic> message= responseData['message'];
+    return message;
+  }
+  Future<List<dynamic>> getrecipebyuser(id) async{
+    var response = await Dio().get(
+      '$baseUrl/getrecipebyuser/${id}',
+    );
+    var responseData = response.data;
+    List<dynamic?> message= responseData['message'];
+    return message;
   }
 }
 

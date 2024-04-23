@@ -6,6 +6,7 @@ import 'package:user/PostSystem/postpage.dart';
 import 'package:user/RestaurantSystem/ItemPage.dart';
 import 'package:user/RestaurantSystem/restaurantpage.dart';
 import 'package:provider/provider.dart';
+import 'package:user/Settings/Profile.dart';
 import 'package:user/Settings/UserProfile.dart';
 import 'package:user/Theme/Theme.dart';
 import 'package:user/Pages/splashscreen.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
               '/detailpost': (context) => const postPage(),
               '/information': (context) => const informationpage(),
               '/editprofile': (context) => const userProfile(),
+              '/profile':(context) => const Profile(),
             },
             navigatorKey: navigatorKey,
             localizationsDelegates: const [KhaltiLocalizations.delegate],

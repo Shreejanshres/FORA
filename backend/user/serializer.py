@@ -51,6 +51,13 @@ class PostSerializer(serializers.ModelSerializer):
         return obj.likes.count()
 
 class FollowSerializer(serializers.ModelSerializer):
+    following = serializers.CharField(source='following.name', read_only=True)
+    class Meta:
+        model=Follow
+        fields = '__all__'
+
+class FollowingSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.name', read_only=True)
     class Meta:
         model=Follow
         fields = '__all__'

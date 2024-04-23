@@ -126,7 +126,7 @@ class _BodyState extends State<Body> {
                       TextButton(
                         onPressed: () {
                           _loaduserdata();
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const ForgotPassword()),

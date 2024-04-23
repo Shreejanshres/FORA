@@ -13,8 +13,10 @@ class Recipe {
   List<String> directions = [];
   List<String> userNames = [];
   List<String> profileUrls = [];
+  List<int> id = [];
   // String baseUrl='http://10.22.10.79:8000';
   String baseUrl='http://192.168.1.66:8000';
+  // String baseUrl='http://192.168.1.116:8000';
   // String baseUrl='http://shreejan.pythonanywhere.com';
   bool isLoading=true;
 
@@ -46,6 +48,7 @@ class Recipe {
           ingredients.add(recipe['ingredients'] ?? '');
           directions.add(recipe['directions'] ?? '');
           userNames.add(recipe['username'] ?? '');
+          id.add(recipe['id']?? '');
           if (recipe['profile_pic'] != null) {
             profileUrls.add(baseUrl + recipe['profile_pic']);
           } else {
@@ -81,7 +84,69 @@ class Recipe {
       throw e;
     }
   }
+  Future<Map<String,dynamic>> getrecipebyid(id) async{
+    var response = await Dio().get(
+      '$baseUrl/getrecipebyid/${id}',
+    );
+    var responseData = response.data;
 
+    return responseData;
+  }
+
+  Future<Map<String,dynamic>> follow(followingto) async{
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    var postdata={
+      "followingto":followingto,
+      "followedby":userId,
+    };
+    var response = await Dio().post(
+      '$baseUrl/addfollow/',
+      data: postdata
+    );
+    var responseData = response.data;
+    return responseData;
+  }
+
+  Future<Map<String,dynamic>> checkfollower(followingto) async{
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    var postdata={
+      "followingto":followingto,
+      "followedby":userId,
+    };
+    print(postdata);
+    var response = await Dio().get(
+        '$baseUrl/checkfollow/',
+        data: postdata
+    );
+    var responseData = response.data;
+    return responseData;
+  }
+  Future<Map<String,dynamic>> deletefollower(followingto) async{
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    var postdata={
+      "followingto":followingto,
+      "followedby":userId,
+    };
+    print(postdata);
+    var response = await Dio().delete(
+        '$baseUrl/deletefollow/',
+        data: postdata
+    );
+    var responseData = response.data;
+    return responseData;
+  }
+
+  Future<bool> checkifsameuser(user) async{
+    int? userId = await getData(); // Assuming this function retrieves the user ID
+    print("from recipe: ${user}");
+    print("from userid: ${userId}");
+    if(user==userId){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
 }
 pickImage(ImageSource source) async{
   final ImagePicker _imagePicker = ImagePicker();

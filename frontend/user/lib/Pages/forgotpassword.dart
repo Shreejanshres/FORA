@@ -90,7 +90,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     return AppBar(
       title: const Text("Forgot Password"),
       centerTitle: true,
-      leading: IconButton(icon:const Icon(Icons.arrow_back_rounded),onPressed: (){print("back to login");},),
+      leading: IconButton(icon:const Icon(Icons.arrow_back_rounded),onPressed: (){
+        Navigator.of(context).pop();
+      },),
     );
   }
 }

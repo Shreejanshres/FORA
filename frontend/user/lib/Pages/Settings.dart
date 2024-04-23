@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:user/Pages/forgotpassword.dart';
+import 'package:user/Pages/login.dart';
 import 'package:user/Theme/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -47,6 +49,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget body(String data) {
     // String baseUrl = 'https://shreejan.pythonanywhere.com';
     String baseUrl = 'http://192.168.1.66:8000';
+    // String baseUrl='http://192.168.1.116:8000';
     return Container(
       width: double.infinity,
       child: Column(
@@ -82,7 +85,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           SizedBox(height: 20),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context,'/profile');
+            },
             child: ListTile(
               title: Text("Accounts"),
               leading: Icon(Icons.person),
@@ -90,9 +95,15 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           SizedBox(height: 10),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ForgotPassword()),
+              );
+            },
             child: ListTile(
-              title: Text("Security"),
+              title: Text("Change Password"),
               leading: Icon(Icons.security),
             ),
           ),
@@ -106,7 +117,15 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           SizedBox(height: 10),
           InkWell(
-            onTap: () {},
+            onTap: () async{
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const LoginPage()),
+              );
+            },
             child: ListTile(
               title: Text("Logout"),
               leading: Icon(Icons.output),

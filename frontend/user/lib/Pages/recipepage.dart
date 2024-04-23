@@ -239,89 +239,100 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   InkWell recipeContain(int index) {
+    String imageUrl = recipe.imageUrls[index];
+    String profileUrl = recipe.profileUrls[index] ?? 'images/Logo.png'; // Use a default image if profile URL is null
+    String userName = recipe.userNames[index];
+    String title = recipe.titles[index];
+    int id = recipe.id[index];
+    print(id);
     return InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, '/detailrestaurant', arguments: index);
-        },
-        child: Stack(
-          children: [
+      onTap: () {
+        Navigator.pushNamed(context, '/detailrestaurant', arguments: id);
+      },
+      child: Stack(
+        children: [
+          if (imageUrl.isNotEmpty) // Check if imageUrl is not empty
             ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
-              // Adjust the radius as needed
               child: Container(
                 height: 150,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(recipe.imageUrls[index]),
+                    image: NetworkImage(imageUrl),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
-                        Colors.black.withOpacity(0.3), BlendMode.colorBurn),
+                      Colors.black.withOpacity(0.3),
+                      BlendMode.colorBurn,
+                    ),
                   ),
                 ),
               ),
             ),
-            Positioned(
-              bottom: 10, // Adjust position as needed
-              left: 10, // Adjust position as needed
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: recipe.profileUrls[index] != null
-                                ? NetworkImage(recipe.profileUrls[index])
-                                : const AssetImage('images/Logo.png')
-                                    as ImageProvider,
-                            fit: BoxFit.fitWidth,
-                          ),
+          Positioned(
+            bottom: 10,
+            left: 10,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: NetworkImage(profileUrl),
+                          fit: BoxFit.fitWidth,
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Text(
-                        recipe.userNames[index],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    recipe.titles[index],
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
                     ),
+                    SizedBox(width: 15),
+                    Text(
+                      userName,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
+
   InkWell postContain(int index) {
+    String imageUrl = post.data[index]['imageUrl'];
+    String profileUrl = post.data[index]['profileUrl'] ?? 'images/Logo.png'; // Use a default image if profile URL is null
+    String userName = post.data[index]['user'];
+    String caption = post.data[index]['caption'];
+    String likeCount = post.data[index]['likeCount'];
+    int id = post.data[index]['id'];
+
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/detailpost', arguments: index);
+        Navigator.pushNamed(context, '/detailpost', arguments: id);
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.0),
         child: Container(
           width: 250,
-          padding: const EdgeInsets.all(5),
+          padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
-            // color: Colors.deepPurple,
             borderRadius: BorderRadius.circular(10.0),
             border: Border.all(
               color: Colors.black,
@@ -343,46 +354,42 @@ class _RecipePageState extends State<RecipePage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: post.data[index]['profileUrl'] != null
-                                  ? NetworkImage(post.data[index]['profileUrl']
-                                      .toString()
-                                      .trim())
-                                  : const AssetImage('images/Logo.png')
-                                      as ImageProvider,
+                              image: NetworkImage(profileUrl),
                               fit: BoxFit.fitWidth,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 5),
-                        Text(post.data[index]['user'])
+                        SizedBox(width: 5),
+                        Text(userName),
                       ],
                     ),
-                    Text(post.data[index]['postedAt'] + 'ago'),
+                    Text('postedAt ago'), // Replace 'postedAt ago' with the actual value
                     SizedBox(
                       height: 60,
-                      child: Text(post.data[index]['caption']),
+                      child: Text(caption),
                     ),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           CupertinoIcons.heart_fill,
                           color: Colors.red,
                           size: 15,
                         ),
-                        Text(post.data[index]['likeCount'])
+                        Text(likeCount),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
               Expanded(
                 child: SizedBox(
                   height: 130,
-                  child: Image.network(
-                    post.data[index]['imageUrl'],
-                    fit: BoxFit
-                        .fitHeight, // Ensure the image covers the entire container
-                  ),
+                  child: imageUrl.isNotEmpty
+                      ? Image.network(
+                    imageUrl,
+                    fit: BoxFit.fitHeight,
+                  )
+                      : Placeholder(), // Placeholder widget or any other fallback UI
                 ),
               ),
             ],

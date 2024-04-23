@@ -273,6 +273,17 @@ def get_post_with_comments_and_likes(request):
         return JsonResponse({"success": True, "message": data})
     else:
         return JsonResponse({"success": False, "message": "The request should be GET"})
+    
+@csrf_exempt
+def get_post(request,id):
+    if request.method == 'GET':
+        post = Post.objects.get(id=id)
+        serializer = PostSerializer(post)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+    
+
 
 @csrf_exempt
 def delete_post(request, id):
@@ -325,6 +336,9 @@ def add_like(request):
         data = json.loads(request.body)
         user = CustomerUser.objects.get(id=data.get('user'))
         post = Post.objects.get(id=data.get('post'))
+          # check if already liked
+        if Like.objects.filter(user=user, post=post).exists():
+            return JsonResponse({"success":False,"message":"Already liked"})
         like = Like.objects.create(
             user=user,
             post=post
@@ -345,57 +359,88 @@ def isliked(request):
         return JsonResponse({"success":False,"message":"The request should be GET"})
 
 @csrf_exempt
-def delete_like(request, id):
+def delete_like(request):
     if request.method == 'DELETE':
-        like = Like.objects.get(id=id)
+        data = json.loads(request.body)
+        user = CustomerUser.objects.get(id=data.get('user'))
+        post = Post.objects.get(id=data.get('post'))
+        like = Like.objects.filter(user=user, post=post)
         like.delete()
         return JsonResponse({"success":True,"message":"Like deleted successfully"})
     else:
         return JsonResponse({"success":False,"message":"The request should be DELETE"})
 
-#follow code
+
 @csrf_exempt
 def add_follow(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        follower = CustomerUser.objects.get(id=data.get('follower'))
-        following = CustomerUser.objects.get(id=data.get('following'))
-        follow = Follow.objects.create(
-            follower=follower,
-            following=following
-        )
-        return JsonResponse({"success":True,"message":"Follow added successfully"})
+        try:
+            data = json.loads(request.body)
+            follower = CustomerUser.objects.get(id=data.get('followedby'))
+            following = CustomerUser.objects.get(id=data.get('followingto'))
+            print(follower,following)
+            # check if already followed
+            if Follow.objects.filter(user=following, following=follower).exists():
+                return JsonResponse({"success":False,"message":"Already followed"})
+            follow = Follow.objects.create(
+                following=follower,
+                user=following
+            )
+            return JsonResponse({"success":True,"message":"Followed successfully"})
+        except Exception as e:
+            return JsonResponse({"success":False,"message":f"Error creating follow: {str(e)}"})
     else:
         return JsonResponse({"success":False,"message":"The request should be POST"})
 
 @csrf_exempt
-def get_follow(request):
+def checkfollower(request):
     if request.method == 'GET':
-        follows = Follow.objects.all()
-        serializer = FollowSerializer(follows, many=True)
-        return JsonResponse({"success":True,"message":serializer.data})
+        data=json.loads(request.body)
+        follower = CustomerUser.objects.get(id=data.get('followedby'))
+        following = CustomerUser.objects.get(id=data.get('followingto'))
+        follows = Follow.objects.filter(user=following, following=follower).exists()
+        return JsonResponse({"success":True,"message":follows})
     else:
         return JsonResponse({"success":False,"message":"The request should be GET"})
 
 @csrf_exempt
-def delete_follow(request, id):
-    if request.method == 'DELETE':
-        follow = Follow.objects.get(id=id)
-        follow.delete()
-        return JsonResponse({"success":True,"message":"Follow deleted successfully"})
+def get_follow(request,id):
+    if request.method == 'GET':
+        follows = Follow.objects.filter(user=id).all()  # Get all the follows for the user with the given ID
+        serializer = FollowSerializer(follows, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
     else:
-        return JsonResponse({"success":False,"message":"The request should be DELETE"})
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+    
+@csrf_exempt
+def get_following(request,id):
+    if request.method == 'GET':
+        follows = Follow.objects.filter(following=id).all()  # Get all the follows for the user with the given ID
+        serializer = FollowingSerializer(follows, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+
+@csrf_exempt
+def delete_follow(request):
+    if request.method == 'DELETE':
+        data = json.loads(request.body)
+        follower = CustomerUser.objects.get(id=data.get('followedby'))
+        following = CustomerUser.objects.get(id=data.get('followingto'))
+        follow = Follow.objects.filter(user=following, following=follower)
+        follow.delete()
+        return JsonResponse({"success":True,"message":"Unfollowed successfully"})
+       
     
 @csrf_exempt
 def updatepic(request):
     if request.method == 'POST':
         try:
             # Retrieve data from the request
-            print(request.body)
             data = json.loads(request.body)
             user_id = data.get('id')
             image_data = data.get('image')
-            print(user_id,image_data)
 
             # Fetch the user object
             user = CustomerUser.objects.get(id=user_id)
@@ -410,8 +455,30 @@ def updatepic(request):
             # Assign the image to the user's profile_pic field
             user.profile_pic.save(temp_image_name, temp_image_file, save=True)
 
-            return JsonResponse({"success": True, "message": "Profile picture updated successfully"})
+            serializers = CustomerUserSerializer(user)
+            print(serializers.data)
+
+            return JsonResponse({"success": True, "message": "Profile picture updated successfully", "data": serializers.data})
         except Exception as e:
             return JsonResponse({"success": False, "message": f"Error: {str(e)}"})
     else:
         return JsonResponse({"success": False, "message": "The request should be POST"})
+    
+
+@csrf_exempt
+def getpostbyuser(request,id):
+    if request.method == 'GET':
+        posts = Post.objects.filter(user=id).all()
+        serializer = PostSerializer(posts, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+@csrf_exempt
+def getrecipebyuser(request,id):
+    if request.method == 'GET':
+        recipes = Recipe.objects.filter(user=id).all()
+        serializer = RecipeSerializer(recipes, many=True)
+        return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
