@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { tokens } from "../../../Theme.jsx";
 import { useTheme } from "@mui/material";
 import Paper from "@mui/material/Paper";
@@ -9,23 +9,21 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 
-const menutable = ({ columns, data, onClick }) => {
+const table = ({ columns, data }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
   const onDelete = async (id) => {
     console.log(id);
     try {
       const response = await axios.delete(
-        `http://127.0.0.1:8000/restaurant/deletemenu/${id}/`
+        `http://127.0.0.1:8000/admin/deleteadmin/${id}/`
       );
       console.log(response);
     } catch (error) {
-      console.error("Error deleting menu item:", error);
+      console.error("Error deleting restaurant:", error);
     }
     window.location.reload();
   };
@@ -75,26 +73,7 @@ const menutable = ({ columns, data, onClick }) => {
                     color: "white",
                   }}
                 >
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor:
-                        theme.palette.mode == "dark"
-                          ? colors.greenAccent[600]
-                          : colors.greenAccent[400],
-                      color: "white",
-                      ":hover": {
-                        backgroundColor:
-                          theme.palette.mode == "dark"
-                            ? colors.greenAccent[500]
-                            : colors.greenAccent[600],
-                        color: "white",
-                      },
-                    }}
-                    onClick={onClick}
-                  >
-                    Add Menu
-                  </Button>
+                  Actions
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -107,6 +86,7 @@ const menutable = ({ columns, data, onClick }) => {
                     </TableCell>
                   ))}
                   <TableCell>
+                    {/* Delete IconButton */}
                     <IconButton
                       sx={{ color: "red" }}
                       onClick={() => onDelete(row.id)}
@@ -123,4 +103,4 @@ const menutable = ({ columns, data, onClick }) => {
     </Box>
   );
 };
-export default menutable;
+export default table;

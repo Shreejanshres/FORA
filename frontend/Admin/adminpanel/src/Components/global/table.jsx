@@ -31,9 +31,9 @@ const table = ({ columns, data }) => {
           sx={{
             maxHeight: "73vh",
 
-            borderRadius: "15px 15px 0 0",
+            // borderRadius: "15px 15px 0 0",
             backgroundColor:
-              theme.palette.mode === "dark" ? colors.primary[600] : "white",
+              theme.palette.mode === "dark" ? colors.primary[400] : "white",
           }}
         >
           <Table stickyHeader>
@@ -44,8 +44,8 @@ const table = ({ columns, data }) => {
                     sx={{
                       backgroundColor:
                         theme.palette.mode === "dark"
-                          ? colors.blueAccent[400]
-                          : colors.blueAccent[500],
+                          ? colors.primary[700]
+                          : colors.primary[600],
                       color: "white",
                     }}
                     key={column.field}
@@ -57,8 +57,8 @@ const table = ({ columns, data }) => {
                   sx={{
                     backgroundColor:
                       theme.palette.mode === "dark"
-                        ? colors.blueAccent[400]
-                        : colors.blueAccent[500],
+                        ? colors.primary[700]
+                        : colors.primary[600],
                     color: "white",
                   }}
                 >
@@ -87,17 +87,7 @@ const table = ({ columns, data }) => {
               ))}
             </TableBody>
 
-            {/* <TableBody>
-              {data.map((row) => (
-                <TableRow key={row.id}>
-                  {columns.map((column) => (
-                    <TableCell key={column.field}>
-                      {row[column.field]}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody> */}
+            
           </Table>
         </TableContainer>
       </Paper>

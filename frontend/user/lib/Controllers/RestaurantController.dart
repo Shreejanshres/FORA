@@ -7,13 +7,12 @@ class Restaurant {
   List<dynamic> headingdata = [];
   // String baseUrl = 'http://10.22.10.79:8000';
   String baseUrl='http://192.168.1.66:8000';
-  // String baseUrl = 'http://shreejan.pythonanywhere.com';
+  // String baseUrl='http://shresthashreejan.com.np';
   // String baseUrl='http://192.168.1.116:8000';
 
   Future<void> getrestaurantdata() async {
     try {
       var response = await Dio().get('$baseUrl/admin/viewrestaurant/');
-      print(response.data);
       if (response.statusCode == 200) {
         restaurants = response.data;
         restaurantNames = restaurants.map((restaurant) {
@@ -32,13 +31,10 @@ class Restaurant {
   Future<void> GetMenu(int id) async {
     try {
       var response = await Dio().get('$baseUrl/restaurant/display_headings/$id/');
-      print(response.data);
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonDataMap = response.data;
         restrodata = jsonDataMap['data'][0];
         headingdata = jsonDataMap['data'][0]['heading_set'];
-        print(restrodata);
-        print(headingdata);
 
         print("finish get restaurant");
       } else {

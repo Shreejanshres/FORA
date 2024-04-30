@@ -63,11 +63,11 @@ const Login = () => {
     }
   };
   useEffect(() => {
-    const token = Cookies.get("token");
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+    const token = document.cookie.split("=")[1];
     if (token) {
-      if (decoded.is_admin) {
-        navigate("/admin/dashboard");
-      }
+      navigate("/admin/dashboard");
     }
   }, [navigate]);
   return (

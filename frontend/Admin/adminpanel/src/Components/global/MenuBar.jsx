@@ -23,14 +23,13 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   return (
     <MenuItem
       component={<Link to={to} />}
-      sx={{
-        color: colors.grey[100],
-      }}
       active={selected === title}
-      icon={icon}
+      icon={<icon.type {...icon.props} style={{ color: "white" }} />}
       onClick={() => setSelected(title)}
     >
-      <Typography variant="h4">{title}</Typography>
+      <Typography variant="h4" color={"white"}>
+        {title}
+      </Typography>
     </MenuItem>
   );
 };
@@ -47,16 +46,12 @@ const AdminItem = ({ isCollapsed, selected, setSelected }) => {
         setSelected={setSelected}
       />
       <Divider />
-      <Typography
-        variant="h6"
-        color={colors.grey[100]}
-        sx={{ m: "15px 0 5px 20px" }}
-      >
+      <Typography variant="h6" color="white"   sx={{ m: "15px 0 5px 20px" }}>
         Data
       </Typography>
       <Item
         title="Restaurant"
-        to="/admin/restaurant"
+        to="/admin/restaurantdata"
         icon={<RestaurantOutlinedIcon />}
         selected={selected}
         setSelected={setSelected}
@@ -91,11 +86,7 @@ const RestaurantItem = ({ isCollapsed, selected, setSelected }) => {
         setSelected={setSelected}
       />
       <Divider />
-      <Typography
-        variant="h6"
-        color={colors.grey[100]}
-        sx={{ m: "15px 0 5px 20px" }}
-      >
+      <Typography variant="h6" color="white" sx={{ m: "15px 0 5px 20px" }}>
         Data
       </Typography>
       <Item
@@ -145,8 +136,8 @@ export default function MenuBar() {
       collapsed={isCollapsed}
       backgroundColor={
         theme.palette.mode === "dark"
-          ? colors.primary[800]
-          : colors.blueAccent[500]
+          ? colors.primary[700]
+          : colors.primary[600]
       }
     >
       <Menu
@@ -154,15 +145,14 @@ export default function MenuBar() {
           button: {
             "&:hover": {
               backgroundColor: "transparent",
-              color: colors.blueAccent[500],
               color:
                 theme.palette.mode === "dark"
                   ? colors.blueAccent[500]
-                  : colors.grey[800],
+                  : colors.blueAccent[300],
             },
             "&:active": {
-              backgroundColor: colors.blueAccent[400],
-              color: colors.greenAccent[500],
+              backgroundColor: colors.blueAccent[600],
+              color: colors.redAccent[200],
             },
             "::after": {
               color: "red",
@@ -178,7 +168,7 @@ export default function MenuBar() {
             margin: "1px 0 20px 0",
             icon: {
               "&:hover": {
-                backgroundColor: "red",
+                backgroundColor: "yellow",
               },
             },
           }}
@@ -195,7 +185,11 @@ export default function MenuBar() {
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 sx={{
                   "&:hover": {
-                    backgroundColor: colors.redAccent[400],
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? colors.redAccent[300]
+                        : colors.redAccent[800],
+                    color: colors.blueAccent[100],
                   },
                 }}
               >

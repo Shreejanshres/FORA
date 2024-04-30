@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
+import 'package:user/Pages/DetailCart.dart';
 import 'package:user/Pages/DetailRecipe.dart';
 import 'package:user/Pages/Information.dart';
 import 'package:user/PostSystem/postpage.dart';
 import 'package:user/RestaurantSystem/ItemPage.dart';
 import 'package:user/RestaurantSystem/restaurantpage.dart';
 import 'package:provider/provider.dart';
+import 'package:user/Settings/OrderHistory.dart';
 import 'package:user/Settings/Profile.dart';
+import 'package:user/Settings/TrackOrder.dart';
 import 'package:user/Settings/UserProfile.dart';
 import 'package:user/Theme/Theme.dart';
 import 'package:user/Pages/splashscreen.dart';
@@ -27,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return KhaltiScope(
-        publicKey: 'test_public_key_3026c03dc8bf4d859d62561b3d70a878',
+        publicKey: '77133b6ac1af449d8779b3027044189d',
         enabledDebugging: true,
         builder: (context, navigatorKey) {
           return MaterialApp(
@@ -43,6 +46,9 @@ class MyApp extends StatelessWidget {
               '/information': (context) => const informationpage(),
               '/editprofile': (context) => const userProfile(),
               '/profile':(context) => const Profile(),
+              '/detailcart':(context) => const DetailCart(),
+              '/orderhistory': (context) => const Orderhistory(),
+              '/trackorder': (context) => const trackOrder(),
             },
             navigatorKey: navigatorKey,
             localizationsDelegates: const [KhaltiLocalizations.delegate],

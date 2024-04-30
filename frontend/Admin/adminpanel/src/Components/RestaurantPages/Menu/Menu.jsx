@@ -11,6 +11,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+import { tokens } from "../../../Theme";
 import Popup from "./AddMenu.jsx";
 import { alpha } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
@@ -40,12 +41,7 @@ const Restaurant = () => {
   ];
 
   const theme = useTheme();
-  const colors = {
-    blueAccent: theme.palette.mode === "dark" ? "#0c84e4" : "#42a5f5",
-    greenAccent: theme.palette.mode === "dark" ? "#4caf50" : "#66bb6a",
-    grey: theme.palette.grey,
-    redAccent: theme.palette.mode === "dark" ? "#f44336" : "#ef5350",
-  };
+  const colors = tokens(theme.palette.mode);
 
   const [open, setOpen] = useState(false);
   const [openheading, setOpenHeading] = useState(false);
@@ -177,7 +173,10 @@ const Restaurant = () => {
           display: "flex",
           // justifyContent: "space-around",
           gap: "10px",
-          backgroundColor: alpha(colors.blueAccent, 0.4),
+          backgroundColor:
+            theme.palette.mode == "dark"
+              ? colors.primary[700]
+              : colors.primary[600],
           height: "50px",
           borderRadius: "10px",
         }}
@@ -189,8 +188,7 @@ const Restaurant = () => {
             fontSize: "15px",
             fontWeight: "bold",
             ":hover": {
-              backgroundColor: colors.greenAccent,
-              color: colors.grey[100],
+              backgroundColor: colors.redAccent[500],
             },
           }}
           onClick={allmenuitems}
@@ -206,8 +204,7 @@ const Restaurant = () => {
               fontSize: "15px",
               fontWeight: "bold",
               ":hover": {
-                backgroundColor: colors.greenAccent,
-                color: colors.grey[100],
+                backgroundColor: colors.redAccent[500],
               },
             }}
             onClick={() => heading_item(index)}
@@ -215,14 +212,20 @@ const Restaurant = () => {
             {heading.heading_name}
           </Button>
         ))}
-        <IconButton
+        <Button
           size="large"
           sx={{
-            backgroundColor: colors.blueAccent,
             margin: "5px 0px 5px 0px",
             color: "white",
+            backgroundColor:
+              theme.palette.mode == "dark"
+                ? colors.greenAccent[600]
+                : colors.greenAccent[400],
             ":hover": {
-              backgroundColor: colors.greenAccent,
+              backgroundColor:
+                theme.palette.mode == "dark"
+                  ? colors.greenAccent[400]
+                  : colors.greenAccent[600],
             },
           }}
           onClick={openaddheading}
@@ -241,15 +244,19 @@ const Restaurant = () => {
             >
               <TextField
                 label="Heading name"
+                color="primary"
                 fullWidth
                 onChange={(e) => setItemName(e.target.value)}
-                // prevent from closing
                 onClick={(e) => e.stopPropagation()}
+                sx={{
+                  marginTop: "10px",
+                }}
               />
               <Button
                 variant="contained"
                 sx={{
-                  background: colors.blueAccent,
+                  background: colors.greenAccent[500],
+                  marginTop: "10px",
                 }}
                 onClick={() => addheading()}
               >
@@ -259,7 +266,8 @@ const Restaurant = () => {
           </Dialog>
 
           <AddIcon />
-        </IconButton>
+          <Typography variant="h5">Add Heading</Typography>
+        </Button>
         <Popup
           open={open}
           close={handleclose}

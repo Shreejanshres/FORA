@@ -53,7 +53,6 @@ const Login = () => {
           setCookies("token", response.data.message, 1);
           navigate("/restaurant/dashboard");
         } else {
-          alert(email);
           navigate("/restaurant/changepassword", { state: { email } });
         }
       } else {

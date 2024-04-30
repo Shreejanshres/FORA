@@ -52,7 +52,7 @@ const Dashboard = () => {
           Dashboard
         </Typography>
       </Box>
-      <Box
+      {/* <Box
         display="flex"
         textAlign={"center"}
         justifyContent={"center"}
@@ -67,7 +67,7 @@ const Dashboard = () => {
         />
         <Data title={"Total Partners"} value={"100"} icon={HandshakeIcon} />
         <Data title={"Total Users"} value={"100"} icon={PeopleIcon} />
-      </Box>
+      </Box> */}
     </Box>
   );
 };

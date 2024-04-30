@@ -66,7 +66,7 @@ export default function changepassword() {
       }
     } catch (error) {
       console.error("Error:", error);
-      // Handle the error, e.g., show an error message to the user
+
     }
   };
 

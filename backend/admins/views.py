@@ -17,9 +17,8 @@ from restaurant.models import RestaurantUser
 from restaurant.serializers import RestaurantUserSerializer
 from django.core.serializers.json import DjangoJSONEncoder
 
-def response(success, message):
-    print(success, message)
-    return JsonResponse({"success": success, "message": message})
+import base64
+from django.core.files.base import ContentFile
 
 
 # Create your views here.
@@ -41,12 +40,12 @@ def adminsignup(request):
             recipient_list = [user.email]
         # Send the email using Gmail
             send_mail(subject, message, from_email,recipient_list, fail_silently=True)
-            return response(True,"Signup Sucessful")
+            return JsonResponse({"success": True, "message": "Admin added successfully"})
         else:
             # If the data is not valid, return the errors
-            return response(False,serializer.errors)    
+            return JsonResponse({"success": False, "message": serializer.errors})   
     else:
-        return response(False,"The method should be POST")
+        return JsonResponse({"success": False, "message": "The method should be POST"})
 
 @csrf_exempt
 def adminlogin(request):
@@ -62,11 +61,11 @@ def adminlogin(request):
                 token = jwt.encode(payload, "secret", algorithm="HS256")
                 return JsonResponse({"success": True, "message": token}, encoder=DjangoJSONEncoder)
             else :  
-                return response(False,"password doesn't match")
+                return JsonResponse({"success": False, "message": "Invalid password"})
         except Exception as e:
-            return response(False,e)
+            return JsonResponse({"success": False, "message": "Invalid email"})
     else:
-        return response(False,"The method should be POST")
+        return JsonResponse({"success": False, "message": "The method should be POST"})
 
 @csrf_exempt
 def getadmins(request):
@@ -75,9 +74,7 @@ def getadmins(request):
         serialized = AdminUserSerializer(alladmins, many=True)
         return JsonResponse(serialized.data, safe=False)
     else:
-        return response(False,"The method should be GET")
-    
-
+        return JsonResponse({"success": False, "message": "The method should be GET"})
 
     
 
@@ -98,12 +95,11 @@ def addrestaurant(request):
             recipient_list = [user.email]
         # Send the email using Gmail
             send_mail(subject, message, from_email,recipient_list, fail_silently=True)
-            return response(True,"Restaurant added successfully")
+            return JsonResponse({"success": True, "message": "Restaurant added successfully"})
         else:
-            return response(False,serializer.errors)
-
+            return JsonResponse({"success": False, "message": serializer.errors})
     else:
-        return response(False,"The method should be POST")
+        return JsonResponse({"success": False, "message": "The method should be POST"})
 
 @csrf_exempt
 def getrestaurantdata(request):
@@ -112,6 +108,50 @@ def getrestaurantdata(request):
         serialized_data = RestaurantUserSerializer(alldata,many=True)
         return JsonResponse(serialized_data.data,safe=False)
     else:
-        return response(False,"The method should be GET")
+        return JsonResponse({"success": False, "message": "The method should be GET"})
+
+@csrf_exempt
+def deleteadmin(request,id):
+    if request.method=="DELETE":
+        try:
+            admin=AdminUser.objects.get(id=id)
+            admin.delete()
+            return JsonResponse({"success": True, "message": "Admin deleted successfully"})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": "Admin not found"})
+    else:
+        return JsonResponse({"success": False, "message": "The method should be POST"})
+    
+@csrf_exempt
+def deleterestaurant(request,id):
+    if request.method=="DELETE":
+        try:
+            restaurant=RestaurantUser.objects.get(id=id)
+            restaurant.delete()
+            return JsonResponse({"success": True, "message": "Restaurant deleted successfully"})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": "Restaurant not found"})
+    else:
+        return JsonResponse({"success": False, "message": "The method should be POST"})
     
 
+@csrf_exempt
+def updateadmin(request,id):
+    if request.method=="PUT":
+        data=json.loads(request.body)
+        profile = data.get("picture")
+        try:
+            restro=AdminUser.objects.get(id=id)
+            if profile is not None:
+                profile_data = base64.b64decode(profile.split(',')[1])
+                profile_name = f"{restro.id}_profile.jpg"
+                restro.picture.save(profile_name, ContentFile(profile_data), save=False)
+            restro.save()
+
+            serializers = AdminUserSerializer(restro, many=False)
+            payload = {"data": serializers.data}
+            token = jwt.encode(payload , "secret", algorithm="HS256")
+            print(token)
+            return JsonResponse({"success":True,"message":"Restaurant updated successfully","token":token})
+        except:
+            return JsonResponse({"success":False,"message":"Restaurant not found"})

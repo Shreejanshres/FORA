@@ -18,11 +18,6 @@ class _DetailRecipeState extends State<DetailRecipe> {
   bool issame=false;
 
 
-// String baseUrl = 'http://10.22.10.79:8000';
-  String baseUrl='http://192.168.1.66:8000';
-  // String baseUrl = 'http://shreejan.pythonanywhere.com';
-  // String baseUrl='http://192.168.1.116:8000';
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -115,7 +110,7 @@ class _DetailRecipeState extends State<DetailRecipe> {
             Container(
               width: double.infinity,
               height: 300,
-              child: Image.network("$baseUrl${data['image']} ", fit: BoxFit.cover)
+              child: Image.network("${recipe.baseUrl}${data['image']} ", fit: BoxFit.cover)
             ),
             SizedBox(height: 5,),
             Row(
@@ -126,7 +121,7 @@ class _DetailRecipeState extends State<DetailRecipe> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: data['profile_pic'] != null ? NetworkImage("$baseUrl${data['profile_pic']}") as ImageProvider<Object> : AssetImage('images/defaultimage.png'),
+                      image: data['profile_pic'] != null ? NetworkImage("${recipe.baseUrl}${data['profile_pic']}") as ImageProvider<Object> : AssetImage('images/defaultimage.png'),
 
                       fit: BoxFit.cover,
 
@@ -181,7 +176,7 @@ class _DetailRecipeState extends State<DetailRecipe> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: data['profile_pic'] != null ? NetworkImage("$baseUrl${data['profile_pic']}") as ImageProvider<Object> : AssetImage('images/defaultimage.png'),
+                          image: data['profile_pic'] != null ? NetworkImage("${recipe.baseUrl}${data['profile_pic']}") as ImageProvider<Object> : AssetImage('images/defaultimage.png'),
                           fit: BoxFit.cover,
                         ),
                       ),

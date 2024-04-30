@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user/Controllers/UserController.dart';
-import 'package:user/Pages/login.dart';
+import 'package:user/Pages/loginPage.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -206,25 +206,25 @@ class _SignupState extends State<Signup> {
                   const Divider(
                     color: Colors.black,
                   ),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    IconButton(
-                      icon: Image.asset(
-                        "images/google.png",
-                        width: 30,
-                        height: 30,
-                        fit: BoxFit.contain,
-                      ),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                        onPressed: () {},
-                        icon: SvgPicture.asset(
-                          "images/facebook.png",
-                          width: 30,
-                          height: 30,
-                          fit: BoxFit.contain,
-                        ))
-                  ]),
+                  // Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  //   IconButton(
+                  //     icon: Image.asset(
+                  //       "images/google.png",
+                  //       width: 30,
+                  //       height: 30,
+                  //       fit: BoxFit.contain,
+                  //     ),
+                  //     onPressed: () {},
+                  //   ),
+                  //   IconButton(
+                  //       onPressed: () {},
+                  //       icon: SvgPicture.asset(
+                  //         "images/facebook.png",
+                  //         width: 30,
+                  //         height: 30,
+                  //         fit: BoxFit.contain,
+                  //       ))
+                  // ]),
                 ],
               ),
             ),

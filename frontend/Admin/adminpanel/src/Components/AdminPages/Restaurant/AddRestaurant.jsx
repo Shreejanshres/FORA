@@ -42,6 +42,7 @@ function AddRestaurant({ open, close, title, data }) {
         if (response.data["success"] === true) {
           alert("Restaurant added successfully");
           close();
+          window.location.reload();
         }
       });
   };
@@ -97,7 +98,7 @@ function AddRestaurant({ open, close, title, data }) {
           size="large"
           variant="contained"
           sx={{
-            backgroundColor: colors.blueAccent[500],
+            backgroundColor: colors.greenAccent[500],
           }}
           onClick={handleSubmit}
         >

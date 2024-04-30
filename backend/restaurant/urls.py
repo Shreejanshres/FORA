@@ -12,6 +12,7 @@ urlpatterns = [
     path('add_heading/',add_heading,name='add_heading'),
     # cart
     path('getcart/<int:id>/',getcart,name='getcart'),
+    path('getindividualcart/',getindividualcart,name='getindividualcart'),
     path('addtocart/',addtocart,name='addtocart'),
     path('deletefromcart/<int:id>/',deletefromcart,name='removefromcart'),
     path('delete/<int:id>/',delete,name='delete'),
@@ -21,9 +22,10 @@ urlpatterns = [
     #order
     path('order/',addtoorder,name='addtoorder'),
     path('getorder/<int:id>/',getorderbyrestaurant,name='getorderbyrestaurant'),
+    path ('getorderbyuser/<int:id>/',getorderbyuser,name='getorder'),
     path('updateorder/<int:id>/',update_order_status,name='update_order_status'),
 
     path('updateopen/',changeopenstatus,name='changeopenstatus'),
-    path('updaterestro/',updaterestro,name='updaterestro'),
+    path('updaterestro/<int:id>/',updaterestro,name='updaterestro'),
 ]
 

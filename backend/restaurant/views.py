@@ -1,3 +1,5 @@
+import base64
+import datetime
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from .models import *
 from .serializers import *
 from django.db import IntegrityError
+from django.core.files.base import ContentFile
 
 
 def customresponse(success, message):
@@ -157,7 +160,39 @@ def viewmenu(request):
             return JsonResponse({"success":False,"message":"No menu found"})
     else:
         return JsonResponse({"success":False,"message":"The method should be GET"})
-    
+
+@csrf_exempt
+def getindividualcart(request):
+    if request.method == "GET":
+        data=json.loads(request.body)
+        userid=data.get("user_id")
+        restroid=data.get("restaurant_id")
+
+        print(userid,restroid)
+        try:
+            cart = CartTable.objects.get(user_id=userid)
+            cart_items = Cartitem.objects.filter(cart=cart,restaurant=restroid)
+            print("hi");
+            serialized = CartItemSerializer(cart_items, many=True)
+            restaurant = RestaurantUser.objects.get(id=restroid);
+            restaurant_serialized = RestaurantUserSerializer(restaurant, many=False)
+
+            restaurant_name = restaurant_serialized.data['name']
+            restaurant_picture = restaurant_serialized.data['picture']
+
+            data={
+                "success": True,
+                "cart": serialized.data,
+                "restaurant": restaurant_name,
+                "picture": restaurant_picture,          
+            }
+            return JsonResponse(data, safe=False)
+        except:
+            return JsonResponse({"success": False, "message": "No cart items found"})
+    else:
+        return JsonResponse({"success": False, "message": "The method should be GET"})
+
+
 @csrf_exempt
 def getcart(request, id):
     if request.method == "GET":
@@ -168,21 +203,46 @@ def getcart(request, id):
             # Retrieve the restaurant ID from the first item in the cart
             restaurant_id = serialized.data.get("cart_item")[0]['restaurant']
             restaurant = RestaurantUser.objects.get(id=restaurant_id);
-
+            # Retrieve the restaurant ID from the first item in the cart
+        
   
             restaurant_serialized = RestaurantUserSerializer(restaurant, many=False)
+            
 
-  
-            restaurant_name = restaurant_serialized.data['name']
-            restaurant_picture = restaurant_serialized.data['picture']
+            #for many items in cart
+            cart_items = serialized.data.get("cart_item")
+                
+                # List to store restaurant IDs
+            restaurant_ids = []
+                
+                # Iterate over each item in the cart
+            for item in cart_items:
+                restaurant_id = item.get('restaurant')
+                restaurant_ids.append(restaurant_id)
+                
+                # Retrieve restaurants for all the restaurant IDs
+            restaurants = RestaurantUser.objects.filter(id__in=restaurant_ids)
+
+            restaurant_serialized = RestaurantUserSerializer(restaurants, many=True)
+            restaurant_ids.clear()
+            restaurant_name=[]
+            restaurant_picture=[]
+            for restaurant_data in restaurant_serialized.data:
+                restaurant_name.append(restaurant_data['name'])
+                restaurant_picture.append(restaurant_data['picture'])
+                restaurant_ids.append(restaurant_data['id'])
+
+            # restaurant_name = restaurant_serialized.data['name']
+            # restaurant_picture = restaurant_serialized.data['picture']
   
             data={
                 "success": True,
                 "cart": serialized.data,
                 "restaurant": restaurant_name,
-                "picture": restaurant_picture,               
+                "picture": restaurant_picture,          
+                "id":restaurant_ids   
             }
-            print(data)
+            print(data['restaurant'])
           
             return JsonResponse(data, safe=False)
             # return JsonResponse({"success": False, "message": data},safe=False)
@@ -212,9 +272,9 @@ def addtocart(request):
             if existing_items.exists():
                 return JsonResponse({"success": False, "message": "Item already exists in cart"})
             
-            existing_restaurant = Cartitem.objects.filter(cart=cart).first()
-            if existing_restaurant is not None and existing_restaurant.restaurant_id != restro_id:
-                return JsonResponse({"success": False, "message": "You can't add items from different restaurants"})
+            # existing_restaurant = Cartitem.objects.filter(cart=cart).first()
+            # # if existing_restaurant is not None and existing_restaurant.restaurant_id != restro_id:
+            # #     return JsonResponse({"success": False, "message": "You can't add items from different restaurants"})
             
             data['cart'] = cart.id
             print(data)
@@ -286,7 +346,6 @@ def update(request):
                     serializer = AddCartItemSerializer(cart, data=item_data, many=False)
                     if serializer.is_valid():
                         serializer.save()
-                       
                     else:
                         return JsonResponse({"success": False, "error": str(serializer.errors)})
                 except Cartitem.DoesNotExist:
@@ -348,6 +407,7 @@ def addtoorder(request):
             address = data.get("address")
             payment_method = data.get("payment_method")
             total_price = data.get("total_price")
+            restro_id = data.get("restaurant_id")
             print(user_id, is_paid, address, payment_method, total_price)
             
             # Fetch user and restaurant instances
@@ -364,7 +424,7 @@ def addtoorder(request):
             
             # Get cart items
             cart = CartTable.objects.get(user_id=user_id)
-            cart_items = Cartitem.objects.filter(cart=cart)
+            cart_items = Cartitem.objects.filter(cart=cart,restaurant=restro_id)
             
             # Create order items from cart items
             for item in cart_items:
@@ -395,12 +455,38 @@ def getorderbyrestaurant(request, id):
                     order['user'] = user.name
                 return JsonResponse({'success': True, 'orders': serialized.data})
             else:
-                return JsonResponse({'success': False,"message": "No orders found for this restaurant"}, status=404)
+                return JsonResponse({'success': False,"message": "No orders found for this restaurant"})
         except Exception as e:
             return JsonResponse({'success': False,"message": str(e)}, status=500)
     else:
         return JsonResponse({'success': False,"message": "The method should be GET"}, status=405)
-    
+
+@csrf_exempt
+def getorderbyuser(request, id):
+    if request.method == "GET":
+        print (id)
+        try:
+            orders = Order.objects.filter(user_id=id)
+            if orders.exists():
+                serialized = OrderSerializer(orders, many=True)
+                for order in serialized.data:
+                    restaurant = RestaurantUser.objects.get(id=order['restaurant'])
+                    order['restaurant'] = restaurant.name
+                    updated_at = order['updated_at']
+                    if isinstance(updated_at, str):
+                        # Do nothing if already formatted
+                        pass
+                    else:
+                        order['updated_at'] = datetime.fromisoformat(updated_at[:-1]).strftime("%Y-%m-%d %H:%M:%S")
+
+                return JsonResponse({'success': True, 'orders': serialized.data})
+            else:
+                return JsonResponse({'success': False,"message": "No orders found for this user"})
+        except Exception as e:
+            return JsonResponse({'success': False,"message": str(e)}, status=500)
+    else:
+        return JsonResponse({'success': False,"message": "The method should be GET"}, status=405)
+
 #update order status
 @csrf_exempt
 def update_order_status(request, id):
@@ -445,13 +531,29 @@ def changeopenstatus(request):
 def updaterestro(request,id):
     if request.method=="PUT":
         data=json.loads(request.body)
+        delivery = data.get("delivery_time")
+        description = data.get("description")
+        profile = data.get("picture")
+        coverphoto = data.get("coverphoto")
         try:
             restro=RestaurantUser.objects.get(id=id)
-            serializer=RestaurantUpdateSerializer(restro,data=data,many=False)
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse({"success":True,"message":"Restaurant updated successfully"})
-            else:
-                return JsonResponse({"success":False,"message":str(serializer.errors)})
+            restro.delivery_time=delivery
+            restro.description=description
+            if profile is not None:
+                profile_data = base64.b64decode(profile.split(',')[1])
+                profile_name = f"{restro.id}_profile.jpg"
+                restro.picture.save(profile_name, ContentFile(profile_data), save=False)
+            if coverphoto is not None:
+                # restro.coverphoto.save(temp_cover_name, temp_cover_file)
+                coverphoto_data = base64.b64decode(coverphoto.split(',')[1])
+                coverphoto_name = f"{restro.id}_cover.jpg"
+                restro.coverphoto.save(coverphoto_name, ContentFile(coverphoto_data), save=False)
+            restro.save()
+
+            serializers = RestaurantUserSerializer(restro, many=False)
+            payload = {"data": serializers.data}
+            token = jwt.encode(payload , "secret", algorithm="HS256")
+            print(token)
+            return JsonResponse({"success":True,"message":"Restaurant updated successfully","token":token})
         except:
             return JsonResponse({"success":False,"message":"Restaurant not found"})

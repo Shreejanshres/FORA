@@ -6,9 +6,13 @@ class Order{
   // String baseUrl='http://10.22.10.79:8000';
   String baseUrl='http://192.168.1.66:8000';
   // String baseUrl='http://192.168.1.116:8000';
-  // String baseUrl='http://shreejan.pythonanywhere.com';
+  // String baseUrl='http://shresthashreejan.com.np';
    List<dynamic> cartitem=[];
-   String name='';
+  List<dynamic> names=[];
+  List<dynamic> pictures=[];
+  List<dynamic> restroid=[];
+
+  String name='';
   String picture='';
   List<int> quantity=[];
   List<double> price = [];
@@ -51,8 +55,31 @@ class Order{
     var response = await Dio().get('$baseUrl/restaurant/getcart/$userId/');
     print(response.data);
     if(response.data['success']){
-      cartid=response.data['cart']['id'];
-      cartitem=response.data['cart']['cart_item'];
+      names=response.data['restaurant'];
+      List<dynamic> picturePaths = response.data['picture'];
+      for (String path in picturePaths) {
+        String picture = baseUrl + path;
+        pictures.add(picture);
+      }
+      restroid=response.data['id'];
+
+      // picture=response.data['picture'] != null ? baseUrl + response.data['picture'] : '';
+
+    }
+    print(names);
+    print(pictures);
+    print(restroid);
+  }
+  Future<Map<String,dynamic>> getindividualcart(int id) async {
+    int? userId = await getData();
+    var data={
+      "user_id":userId,
+      "restaurant_id":id
+    };
+    var response = await Dio().get('$baseUrl/restaurant/getindividualcart/',data: data);
+    // print(response.data);
+    if(response.data['success']){
+      cartitem=response.data['cart'];
       for(int i=0;i<cartitem.length;i++){
         double priceValue = double.parse(cartitem[i]['item']['price']); // Parse as double
         price.add(priceValue);
@@ -65,7 +92,14 @@ class Order{
       }
       name=response.data['restaurant'];
       picture=response.data['picture'] != null ? baseUrl + response.data['picture'] : '';
+
     }
+    print("cartitem: ${cartitem}");
+    print("notes: ${notes.length}");
+    print("price${price}");
+    print("price${quantity}");
+    print("price${subtotal}");
+    return response.data;
   }
 
   void updateSubtotal() {
@@ -102,11 +136,12 @@ class Order{
     return response.data;
   }
 
-  Future<Map<String,dynamic>> order(String payment_method, bool ispaid, String address, double totalprice )async{
+  Future<Map<String,dynamic>> order(String payment_method, bool ispaid, String address, double totalprice,int restro_id)async{
     int? userId = await getData();
   print("from order function: ");
   Map<String,dynamic> data={
     "user_id": userId,
+    "restaurant_id":restro_id,
     "is_paid":ispaid,
     "address":address,
     "payment_method": payment_method,
@@ -116,6 +151,12 @@ class Order{
   return response.data;
   }
 
+  Future<Map<String,dynamic>> getorderhistory() async {
+    int? userId = await getData();
+    var response = await Dio().get('$baseUrl/restaurant/getorderbyuser/$userId/',);
+    return response.data;
+  }
+  
   Future<Map<String,dynamic>> verifypayment(token,int amount )async{
     print(token);
     print(amount);

@@ -1,10 +1,71 @@
 import { Box, Grid, Icon, Typography, useTheme } from "@mui/material";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import HandshakeIcon from "@mui/icons-material/Handshake";
-import PeopleIcon from "@mui/icons-material/People";
+import { LineChart } from "../global/LineChart.jsx";
 
 import { tokens } from "../../Theme";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+const Dashboard = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const [errormessage, setErrorMessage] = React.useState("");
+  const [xAxis, setXAxis] = React.useState([]);
+  const [yAxis, setYAxis] = React.useState([]);
+  useEffect(() => {
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+    const token = tokenCookie.split("=")[1];
+    const data = JSON.parse(atob(token.split(".")[1]));
+    console.log(data);
+    const restroId = data.data.id;
+    axios
+      .get(`http://127.0.0.1:8000/restaurant/getorder/${restroId}/`)
+      .then((response) => {
+        if (response.data["success"]) {
+          const orderData = response.data["orders"];
+          const hourData = {};
+          orderData.forEach((order) => {
+            const timestamp = order.updated_at;
+            const date = new Date(timestamp);
+            const hour = date.getHours();
+            if (!hourData[hour]) {
+              hourData[hour] = 1;
+            } else {
+              hourData[hour]++;
+            }
+          });
+          const xAxis = Object.keys(hourData).map((hour) => parseInt(hour));
+          const yAxis = Object.values(hourData);
+
+          // Update state variables
+          setXAxis(xAxis);
+          setYAxis(yAxis);
+        } else {
+          setErrorMessage(response.data["message"]);
+        }
+      });
+  }, []);
+  return (
+    <Box
+      sx={{
+        flexGrow: 1,
+        bgcolor: "background.default",
+        ml: 3,
+      }}
+    >
+      <Box>
+        <Typography variant="h1" fontWeight="bold">
+          Dashboard
+        </Typography>
+      </Box>
+      <Box>
+        
+      </Box>
+    </Box>
+  );
+};
+
+export default Dashboard;
+
 const Data = ({ title, value, icon: IconComponent }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -38,40 +99,3 @@ const Data = ({ title, value, icon: IconComponent }) => {
     </Box>
   );
 };
-const Dashboard = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        bgcolor: "background.default",
-        ml: 3,
-      }}
-    >
-      <Box>
-        <Typography variant="h1" fontWeight="bold">
-          Dashboard
-        </Typography>
-      </Box>
-      <Box
-        display="flex"
-        textAlign={"center"}
-        justifyContent={"center"}
-        alignItems={"center"}
-        pt={5}
-        gap={15}
-      >
-        <Data
-          title={"Total Deliveries"}
-          value={"100"}
-          icon={LocalShippingIcon}
-        />
-        <Data title={"Total Partners"} value={"100"} icon={HandshakeIcon} />
-        <Data title={"Total Users"} value={"100"} icon={PeopleIcon} />
-      </Box>
-    </Box>
-  );
-};
-
-export default Dashboard;

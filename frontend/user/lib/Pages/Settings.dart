@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user/Pages/forgotpassword.dart';
-import 'package:user/Pages/login.dart';
+import 'package:user/Pages/loginPage.dart';
 import 'package:user/Theme/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -109,12 +109,23 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           SizedBox(height: 10),
           InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, '/orderhistory');
+            },
+            child: ListTile(
+              title: Text("Order History"),
+              leading: Icon(Icons.shopping_basket),
+            ),
+          ),
+          SizedBox(height: 10),
+          InkWell(
             onTap: () {},
             child: ListTile(
               title: Text("FAQ"),
               leading: Icon(Icons.question_answer),
             ),
           ),
+
           SizedBox(height: 10),
           InkWell(
             onTap: () async{

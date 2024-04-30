@@ -21,7 +21,6 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import Help from "@mui/icons-material/Help";
 import axios from "axios";
 const Topbar = () => {
-  const [user, setUser] = useState("");
   const [picture, setPicture] = useState("");
   const [name, setName] = useState("");
   const theme = useTheme();
@@ -40,16 +39,23 @@ const Topbar = () => {
     const token = tokenCookie.split("=")[1];
     const data = JSON.parse(atob(token.split(".")[1]));
     setIsRestaurantOpen(data.data.open);
-    console.log(tokenCookie);
     // Check if token exists
     if (tokenCookie) {
       const token = tokenCookie.split("=")[1];
       const data = JSON.parse(atob(token.split(".")[1]));
       setName(data.data.name);
+      setPicture(data.data.picture);
     }
   }, []);
 
   const handlelogout = () => {
+    // clear the cookies
+    const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+    if (tokenCookie) {
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
     if (window.location.pathname.includes("/admin")) {
       window.location.href = "/admin";
     } else {
@@ -60,6 +66,8 @@ const Topbar = () => {
   const handleUser = () => {
     if (window.location.pathname.includes("/restaurant")) {
       window.location.href = "/restaurant/profile";
+    } else if (window.location.pathname.includes("/admin")) {
+      window.location.href = "/admin/profile";
     }
   };
 
@@ -114,9 +122,9 @@ const Topbar = () => {
           <LightModeOutlinedIcon sx={{ fontSize: "25px" }} />
         )}
       </IconButton>
-      <IconButton component={Link} to="/faq">
+      {/* <IconButton component={Link} to="/faq">
         <Help sx={{ fontSize: "23px" }} />
-      </IconButton>
+      </IconButton> */}
       <FormControl variant="standard" value={name}>
         <Select
           value={name}
@@ -145,7 +153,7 @@ const Topbar = () => {
               <Box
                 component="img"
                 alt="profile"
-                src={`src/assets/1.jpg`}
+                src={`http://127.0.0.1:8000/${picture}`} // Make sure picture holds the correct value
                 height="40px"
                 width="40px"
                 borderRadius="50%"

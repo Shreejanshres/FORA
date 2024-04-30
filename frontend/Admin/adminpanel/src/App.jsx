@@ -11,6 +11,7 @@ import Adminlogin from "./Components/AdminPages/Login.jsx";
 import Admindashboard from "./Components/AdminPages/Dashboard.jsx";
 import Restaurant from "./Components/AdminPages/Restaurant/Restaurant.jsx";
 import Admin from "./Components/AdminPages/Admin/Admin.jsx";
+import AdminProfile from "./Components/AdminPages/UserProfile.jsx";
 //restaurant
 import Restaurantlogin from "./Components/RestaurantPages/Login.jsx";
 import Restaurantdashboard from "./Components/RestaurantPages/Dashboard.jsx";
@@ -48,7 +49,8 @@ function App() {
             <Routes>
               <Route path="/admin" element={<Adminlogin />} />
               <Route path="/admin/dashboard" element={<Admindashboard />} />
-              <Route path="/admin/restaurant" element={<Restaurant />} />
+              <Route path="/admin/restaurantdata" element={<Restaurant />} />
+              <Route path="/admin/profile" element={<AdminProfile />} />
               <Route path="/admin/admin" element={<Admin />} />
 
               <Route path="/restaurant/" element={<Restaurantlogin />} />

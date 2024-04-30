@@ -75,20 +75,14 @@ function AddMenu({ open, close, title, headings }) {
             pt: 1,
           }}
         >
-          <TextField
-            label="Item Name"
-            fullWidth
-            onChange={(e) => setItemName(e.target.value)}
-          />
-          <TextField
-            label="Price"
-            fullWidth
-            onChange={(e) => setPrice(e.target.value)}
-          />
+          <Typography variant="h6">Item Name</Typography>
+          <TextField fullWidth onChange={(e) => setItemName(e.target.value)} />
+          <Typography variant="h6">Price</Typography>
+          <TextField fullWidth onChange={(e) => setPrice(e.target.value)} />
+          <Typography variant="h6">Tags</Typography>
           <Select
-            label="Tag"
             fullWidth
-            value={tag || ""}
+            value={tag || "Tag"}
             onChange={(e) => setTag(e.target.value)}
           >
             {tags.map((tagItem) => (
@@ -97,10 +91,11 @@ function AddMenu({ open, close, title, headings }) {
               </MenuItem>
             ))}
           </Select>
+          <Typography variant="h6">Headings</Typography>
           <Select
             label="Heading"
             fullWidth
-            value={heading || ""}
+            value={heading || "Heading"}
             onChange={(e) => setHeading(e.target.value)}
           >
             {headings.map((headingItem) => (
@@ -120,7 +115,7 @@ function AddMenu({ open, close, title, headings }) {
           size="large"
           variant="contained"
           sx={{
-            backgroundColor: colors.blueAccent[500],
+            backgroundColor: colors.greenAccent[500],
           }}
           onClick={() => addmenuitem()}
         >

@@ -1,14 +1,8 @@
-import { react, useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  Input,
-  useTheme,
-  TextField,
-} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../Theme";
 import axios from "axios";
+
 export default function UserProfile() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -17,11 +11,7 @@ export default function UserProfile() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [picture, setPicture] = useState("");
-  const [cover, setCover] = useState("");
-  const [delivery, setDelivery] = useState("");
-  const [description, setDescription] = useState("");
   const [id, setId] = useState("");
-
   const [tempimage, setTempImage] = useState(null);
   const [tempprofile, setTempProfile] = useState(null);
 
@@ -32,17 +22,16 @@ export default function UserProfile() {
     if (tokenCookie) {
       const token = tokenCookie.split("=")[1];
       const data = JSON.parse(atob(token.split(".")[1]));
+      console.log(data);
       setId(data.data.id);
       setName(data.data.name);
       setEmail(data.data.email);
       setPhone(data.data.phonenumber);
       setAddress(data.data.address);
       setPicture(data.data.picture);
-      setCover(data.data.coverphoto);
-      setDelivery(data.data.delivery_time);
-      setDescription(data.data.description);
     }
   }, []);
+
   const setCookies = (name, value, days) => {
     var expires = "";
     if (days) {
@@ -52,28 +41,20 @@ export default function UserProfile() {
     }
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
   };
+
   const handleSave = () => {
     const data = {
-      delivery_time: delivery,
-      description: description,
-      coverphoto: tempimage,
       picture: tempprofile,
     };
     console.log(data);
     axios
-      .put(`http://127.0.0.1:8000/restaurant/updaterestro/${id}/`, data)
+      .put(`http://127.0.0.1:8000/admin/updateadmin/${id}/`, data)
       .then((response) => {
         setCookies("token", response.data.token, 1);
+        window.location.reload();
       });
   };
-  const handlePhotoChange = async (event) => {
-    const selectedFile = event.target.files[0];
-    console.log(selectedFile);
-    if (selectedFile) {
-      const base64 = await convertToBase64(selectedFile);
-      setTempImage(base64);
-    }
-  };
+
   const handleProfileChange = async (event) => {
     const selectedFile = event.target.files[0];
     console.log(selectedFile);
@@ -82,6 +63,7 @@ export default function UserProfile() {
       setTempProfile(base64);
     }
   };
+
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -102,45 +84,30 @@ export default function UserProfile() {
           User Profile
         </Typography>
       </Box>
+
       <Box
-        width={"100%"}
-        height={"18rem"}
-        sx={{
-          backgroundColor: "lightgray",
-          backgroundImage:
-            tempimage != null
-              ? `url(${tempimage})`
-              : cover != null
-              ? `url(http://127.0.0.1:8000/${cover})`
-              : null,
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          position: "relative",
-          cursor: "pointer",
-          "&:hover": { opacity: 0.5 }, // Apply opacity on hover
+        mt={2}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
-        onClick={() => document.getElementById("fileInput").click()}
       >
-        {cover != null && tempimage != null ? null : <p>Add photo</p>}
-      </Box>
-      <input
-        id="fileInput"
-        type="file"
-        onChange={handlePhotoChange}
-        style={{ display: "none" }}
-      />
-      <Box mt={2} display={"flex"}>
         {/* profile image */}
         <Box>
           <img
             src={
-              tempprofile != null
-                ? tempprofile
-                : picture != null
-                ? `http://127.0.0.1:8000/${picture}`
-                : null
+              tempprofile != null ? (
+                tempprofile
+              ) : picture != null ? (
+                `http://127.0.0.1:8000/${picture}`
+              ) : (
+                <Box>
+                  <Typography variant="h3">No Image</Typography>
+                </Box>
+              )
             }
-            alt="user"
+            // alt="Profile Picture"
             style={{ width: "200px", height: "200px", cursor: "pointer" }}
             onClick={() => document.getElementById("profileinput").click()}
           />
@@ -166,20 +133,10 @@ export default function UserProfile() {
           <Typography variant="h3">Address: {address}</Typography>
         </Box>
       </Box>
-      <Box mt={2} width={60} display={"flex"} flexDirection={"column"}>
-        <Typography variant="h3">Delivery Time:</Typography>
-        <TextField
-          value={delivery}
-          onChange={(e) => setDelivery(e.target.value)}
-        />
-        <Typography variant="h3">Description:</Typography>
-        <TextField
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+      <Box style={{ display: "flex", justifyContent: "center" }}>
         <Button
           variant="contained"
-          sx={{ backgroundColor: colors.blueAccent[700] }}
+          sx={{ backgroundColor: colors.blueAccent[400], color: "white" }}
           size="large"
           onClick={handleSave}
         >

@@ -1,6 +1,6 @@
 import { Box, TextField, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../../Theme.jsx";
-import Table from "../../global/table.jsx";
+import Table from "./restauranttable.jsx";
 import { alpha, styled } from "@mui/material/styles";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
@@ -40,34 +40,25 @@ const columns = [
   },
 ];
 
-// const rows = [
-//   {
-//     id: 1,
-//     restaurant: "foodhub by H2O",
-//     address: "Jhochhen",
-//     phone: "9841385218",
-//     email: "foodhub@gmail.com",
-//     ownerName: "John Doe",
-//   },
-// ];
-
-const CssTextField = styled(TextField)({
+const CssTextField = styled(TextField)(({ theme }) => ({
   "& label.Mui-focused": {
-    color: "#A0AAB4",
+    color: theme.palette.mode === "dark" ? "white" : "black",
   },
-
+  "& .MuiOutlinedInput-focused": {
+    color: "blue",
+  },
   "& .MuiInput-underline:after": {
-    borderBottomColor: "#B2BAC2",
+    borderBottomColor: theme.palette.mode === "dark" ? "white" : "black",
   },
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
-      borderColor: "#E0E3E7",
+      borderColor: theme.palette.mode === "dark" ? "white" : "black",
     },
     "&:hover fieldset": {
-      borderColor: "#B2BAC2",
+      borderColor: theme.palette.mode === "dark" ? "white" : "black",
     },
   },
-});
+}));
 
 const Restaurant = () => {
   const theme = useTheme();
@@ -82,8 +73,6 @@ const Restaurant = () => {
     axios
       .get("http://127.0.0.1:8000/admin/viewrestaurant/")
       .then((response) => {
-        // Handle the data from the backend
-        console.log(response.data);
         setRows(response.data);
       })
       .catch((error) => {
@@ -117,13 +106,18 @@ const Restaurant = () => {
           }}
         />
         <Button
-          variant="outlined"
+          variant="contained"
           sx={{
-            borderRadius: 3,
-            borderColor: colors.greenAccent[500],
-            color: colors.grey[100],
+            backgroundColor:
+              theme.palette.mode == "dark"
+                ? colors.greenAccent[600]
+                : colors.greenAccent[400],
+            color: "white",
             ":hover": {
-              backgroundColor: colors.greenAccent[800],
+              backgroundColor:
+                theme.palette.mode == "dark"
+                  ? colors.greenAccent[400]
+                  : colors.greenAccent[600],
             },
           }}
           onClick={() => setOpen(!open)}

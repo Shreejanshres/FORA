@@ -73,9 +73,12 @@ export default function Orders() {
   const handleStatusChange = (status, orderId) => {
     // Send a request to update the status
     axios
-      .put(`http://127.0.0.1:8000/restaurant/updateorder/${orderId}/`, {
-        status: status,
-      })
+      .put(
+        `http://127.0.0.1:8000/restaurant/updateorder/${orderId}/`,
+        {
+          status: status,
+        }
+      )
       .then((response) => {
         if (response.data["success"] === true) {
           // Update the status in the local state
@@ -121,9 +124,9 @@ export default function Orders() {
           <TableContainer
             sx={{
               maxHeight: "73vh",
-              borderRadius: "15px 15px 0 0",
+              // borderRadius: "15px 15px 0 0",
               backgroundColor:
-                theme.palette.mode === "dark" ? colors.primary[600] : "white",
+                theme.palette.mode === "dark" ? colors.primary[400] : "white",
             }}
           >
             <Table>
@@ -135,8 +138,8 @@ export default function Orders() {
                       sx={{
                         backgroundColor:
                           theme.palette.mode === "dark"
-                            ? colors.blueAccent[400]
-                            : colors.blueAccent[500],
+                          ? colors.primary[700]
+                          : colors.primary[600],
                         color: "white",
                       }}
                     >

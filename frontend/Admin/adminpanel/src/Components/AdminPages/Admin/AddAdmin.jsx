@@ -41,10 +41,10 @@ function AddRestaurant({ open, close, title, data }) {
           },
         }
       );
-      console.log(response.data.success);
       if (response.data.success) {
-        alert("Restaurant added successfully");
+        alert("Admin added successfully");
         close();
+        window.location.reload();
       } else {
         alert(response.data.message);
       }
@@ -99,7 +99,7 @@ function AddRestaurant({ open, close, title, data }) {
           size="large"
           variant="contained"
           sx={{
-            backgroundColor: colors.blueAccent[500],
+            backgroundColor: colors.greenAccent[500],
           }}
           onClick={handleSubmit}
         >
