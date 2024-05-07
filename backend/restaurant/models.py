@@ -104,3 +104,11 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.item.item_name} in Order {self.order.id}"
     
+
+class promotionimage(models.Model):
+    picture=models.ImageField(upload_to='promotionimages/')
+    restaurant=models.ForeignKey(RestaurantUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.restaurant
+    

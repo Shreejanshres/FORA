@@ -19,6 +19,8 @@ import Restaurantmenu from "./Components/RestaurantPages/Menu/Menu.jsx";
 import Orders from "./Components/RestaurantPages/Orders/Orders.jsx";
 import RestroChange from "./Components/RestaurantPages/ChangePassword.jsx";
 import RestroUser from "./Components/RestaurantPages/UserProfile.jsx";
+import Promotion from  "./Components/RestaurantPages/Promotion.jsx";
+
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -65,6 +67,7 @@ function App() {
               <Route path="/restaurant/menu" element={<Restaurantmenu />} />
               <Route path="/restaurant/orders" element={<Orders />} />
               <Route path="/restaurant/profile" element={<RestroUser />} />
+              <Route path="/restaurant/promotion" element={<Promotion />} />
             </Routes>
           </main>
         </div>

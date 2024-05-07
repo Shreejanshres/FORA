@@ -9,5 +9,4 @@ urlpatterns = [
     path('viewrestaurant/',getrestaurantdata,name="getrestaurantdata"),
     path('deleteadmin/<int:id>/',deleteadmin,name="deleteadmin"),
     path('deleterestaurant/<int:id>/',deleterestaurant,name="deleterestaurant"),
-
 ]

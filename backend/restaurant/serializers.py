@@ -23,6 +23,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 class MenuSerializer(serializers.ModelSerializer):
+    tag = TagSerializer(many=False, read_only=True)
     class Meta:
         model=MenuItem
         fields='__all__'
@@ -84,4 +85,10 @@ class RestaurantUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model=RestaurantUser
         fields=['picture','coverphoto','delivery_time','description']
-    
+
+
+class PromotionImageSerializer(serializers.ModelSerializer):
+    restaurant=RestaurantUserSerializer(many=False, read_only=True)
+    class Meta:
+        model=promotionimage
+        fields='__all__'

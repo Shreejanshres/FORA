@@ -27,5 +27,11 @@ urlpatterns = [
 
     path('updateopen/',changeopenstatus,name='changeopenstatus'),
     path('updaterestro/<int:id>/',updaterestro,name='updaterestro'),
+
+    path("addpromotion/",addpromotion,name="addpromotion"),
+    path("getpromotion/",getpromotion,name="getpromotion"),
+    path("getpromotionbyid/<int:id>/",getpromotionbyid,name="getpromotionbyid"),
+    path("deletepromotion/<int:id>/",deletepromotion,name="deletepromotion"),
+
 ]
 

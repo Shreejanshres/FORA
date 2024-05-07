@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class User{
-  // String baseUrl='http://10.22.10.79:8000';
+  // String baseUrl='http://10.22.31.33:8000';
   String baseUrl='http://192.168.1.66:8000';
   // String baseUrl='http://192.168.1.116:8000';
   // String baseUrl='http://shresthashreejan.com.np';
@@ -31,6 +31,7 @@ class User{
   }
 
   Future<Map<String,dynamic>> userSignup(data) async {
+    print("hi");
     data=jsonEncode(data);
     var response = await Dio().post(
       '$baseUrl/',

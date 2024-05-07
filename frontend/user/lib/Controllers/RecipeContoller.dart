@@ -16,6 +16,7 @@ class Recipe {
   List<int> id = [];
   // String baseUrl='http://10.22.10.79:8000';
   String baseUrl='http://192.168.1.66:8000';
+  // String baseUrl='http://10.22.31.33:8000';
   // String baseUrl='http://192.168.1.116:8000';
   // String baseUrl='http://shresthashreejan.com.np';
   bool isLoading=true;

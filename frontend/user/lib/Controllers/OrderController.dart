@@ -5,6 +5,7 @@ import "package:dio/dio.dart";
 class Order{
   // String baseUrl='http://10.22.10.79:8000';
   String baseUrl='http://192.168.1.66:8000';
+  // String baseUrl='http://10.22.31.33:8000';
   // String baseUrl='http://192.168.1.116:8000';
   // String baseUrl='http://shresthashreejan.com.np';
    List<dynamic> cartitem=[];
@@ -94,11 +95,11 @@ class Order{
       picture=response.data['picture'] != null ? baseUrl + response.data['picture'] : '';
 
     }
-    print("cartitem: ${cartitem}");
-    print("notes: ${notes.length}");
-    print("price${price}");
-    print("price${quantity}");
-    print("price${subtotal}");
+    // print("cartitem: ${cartitem}");
+    // print("notes: ${notes.length}");
+    // print("price${price}");
+    // print("price${quantity}");
+    // print("price${subtotal}");
     return response.data;
   }
 
@@ -147,6 +148,7 @@ class Order{
     "payment_method": payment_method,
     "total_price":totalprice,
   };
+  print(data);
   var response= await Dio().post('$baseUrl/restaurant/order/',data: jsonEncode(data));
   return response.data;
   }
@@ -157,9 +159,24 @@ class Order{
     return response.data;
   }
   
-  Future<Map<String,dynamic>> verifypayment(token,int amount )async{
+  Future<Map<String,dynamic>> verifypayment(token,int amount ,String productname,idx)async{
+    var prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('email');
+
+    var data={
+      "token": token,
+       "amount":amount,
+      "email":email,
+      "product_name": productname,
+      "idx":idx,
+    };
+    print(data);
     print(token);
     print(amount);
-    return {"data":"Hi"};
+    print(email);
+
+    var response = await Dio().get('$baseUrl/payment/', data: data);
+    print(response);
+    return response.data;
   }
 }

@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-!+iin1@2&nw-fr8a@3h2d#eqsb$mseyy#=c-wq77w=g@0i&2x9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.22.10.79','192.168.1.66','127.0.0.1','192.168.1.103']
+ALLOWED_HOSTS = ['10.22.10.79','10.22.31.33','192.168.1.66','127.0.0.1','192.168.1.103']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'user.apps.UserConfig', 
     'restaurant.apps.RestaurantConfig',
+    'payment.apps.PaymentConfig',
     'admins.apps.AdminsConfig', 
     'django.contrib.admin',
     'corsheaders',
@@ -188,3 +189,6 @@ CORS_ALLOW_CREDENTIALS = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+KHALTI_SECRET_KEY = "test_public_key_e807c3d5457747f392e4be693dd81e8a"
+KHALTI_VERIFY_URL = "https://khalti.com/api/v2/payment/epayment/lookup/"

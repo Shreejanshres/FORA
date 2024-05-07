@@ -17,7 +17,7 @@ const table = ({ columns, data }) => {
   const colors = tokens(theme.palette.mode);
   const onDelete = async (id) => {
     console.log(id);
-    try {
+    try {         
       const response = await axios.delete(
         `http://127.0.0.1:8000/admin/deleterestaurant/${id}/`
       );

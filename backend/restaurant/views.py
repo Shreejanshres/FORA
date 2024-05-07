@@ -149,12 +149,12 @@ def addmenu(request):
 @csrf_exempt
 def viewmenu(request):
     if request.method=="GET":
-        data=json.loads(request.body)
-        id=data.get( "id" )
-        tag=data.get("tag")
+        # data=json.loads(request.body)
+        # id=data.get( "id" )
+        # tag=data.get("tag")
         try:
-            menuitem=MenuItem.objects.filter(restaurant=id)
-            serialized=MenuSerializer(menuitem,many=True)
+            menuitem=RestaurantUser.objects.all()
+            serialized=DetailDataSerializer(menuitem,many=True)
             return  JsonResponse(serialized.data,safe=False)
         except:
             return JsonResponse({"success":False,"message":"No menu found"})
@@ -395,7 +395,6 @@ def getrestro(id):
         return restaurant_user
     except Exception as e:
         return None
-   
 
 @csrf_exempt
 def addtoorder(request):
@@ -420,7 +419,7 @@ def addtoorder(request):
             
             # Create order
             order = Order.objects.create(user=user, restaurant=restro, ispaid=is_paid, address=address, 
-                                         payment_method=payment_method, total_price=total_price)
+                                        payment_method=payment_method, total_price=total_price)
             
             # Get cart items
             cart = CartTable.objects.get(user_id=user_id)
@@ -557,3 +556,66 @@ def updaterestro(request,id):
             return JsonResponse({"success":True,"message":"Restaurant updated successfully","token":token})
         except:
             return JsonResponse({"success":False,"message":"Restaurant not found"})
+
+
+
+@csrf_exempt
+def addpromotion(request):
+    if request.method=="POST":
+        data=json.loads(request.body)
+        id = data.get("restaurant")
+        profile = data.get("picture")
+        try:
+            restro = RestaurantUser.objects.get(id=id)
+            print(restro)
+            if profile is not None:
+                profile_data = base64.b64decode(profile.split(',')[1])
+                profile_name = f"{restro.id}_profile.jpg"
+                profile = ContentFile(profile_data, profile_name)
+    
+            promotion = promotionimage.objects.create(restaurant=restro, picture=profile)
+            promotion.save()
+            return JsonResponse({"success":True,"message":"Promotion added successfully"})
+        except:
+            return JsonResponse({"success":False,"message":"Restaurant not found"})
+    else:
+        return JsonResponse({"success":False,"message":"The method should be POST"})
+    
+@csrf_exempt
+def getpromotion(request):
+    if request.method=="GET":
+        try:
+            promotions=promotionimage.objects.all()
+            serialized=PromotionImageSerializer(promotions,many=True)
+            return JsonResponse({"success":True,"message":serialized.data})
+        except:
+            return JsonResponse({"success":False,"message":"No promotions found"})
+    else:
+        return JsonResponse({"success":False,"message":"The method should be GET"})
+
+@csrf_exempt
+def getpromotionbyid(request, id):
+    if request.method == "GET":
+        try:
+            # Filter promotion images by restaurant id
+            promotions = promotionimage.objects.filter(restaurant=id)
+            
+            # Serialize the queryset
+            serialized = PromotionImageSerializer(promotions, many=True)
+            
+            # Return serialized data as JSON response
+            return JsonResponse(serialized.data, safe=False)
+        except promotionimage.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Promotion not found"})
+
+@csrf_exempt
+def deletepromotion(request,id):
+    if request.method=="DELETE":
+        try:
+            promotion=promotionimage.objects.get(id=id)
+            promotion.delete()
+            return JsonResponse({"success":True,"message":"Promotion deleted successfully"})
+        except:
+            return JsonResponse({"success":False,"message":"Promotion not found"})
+    else:
+        return JsonResponse({"success":False,"message":"The method should be DELETE"})
