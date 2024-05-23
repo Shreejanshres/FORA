@@ -57,7 +57,7 @@ const Login = () => {
 				}
 			} else {
 				alert(response.data.message);
-			} 
+			}
 		} catch (error) {
 			console.error("Error:", error);
 		}
@@ -67,8 +67,7 @@ const Login = () => {
 		const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
 		const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
 		const token = document.cookie.split("=")[1];
-
-		if (token) {
+		if (tokenCookie) {
 			navigate("/restaurant/dashboard");
 		}
 	}, [navigate]);
@@ -123,6 +122,12 @@ const Login = () => {
 								color: "white", // Label color
 							},
 						}}
+						InputProps={{
+							style: {
+								color: "white", // Text color
+								borderColor: "white !important", // Border color
+							},
+						}}
 						onChange={(e) => {
 							setEmail(e.target.value);
 						}}
@@ -135,6 +140,11 @@ const Login = () => {
 						label="Password"
 						onChange={(e) => {
 							setPassword(e.target.value);
+						}}
+						InputLabelProps={{
+							style: {
+								color: "white", // Label color
+							},
 						}}
 						InputProps={{
 							endAdornment: (

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:user/Pages/CartPage.dart';
 import 'package:user/Pages/Settings.dart';
@@ -6,9 +5,9 @@ import 'package:user/PostSystem/addPost.dart';
 
 import 'package:user/RestaurantSystem/homepage.dart';
 import 'package:user/Pages/recipepage.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
-
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -17,14 +16,15 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int currentIndex = 0;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+    
       body: _getPage(currentIndex),
       bottomNavigationBar: bottomNavigationBar(),
     );
   }
+
   Widget _getPage(int index) {
     switch (index) {
       case 0:
@@ -60,23 +60,18 @@ class _DashboardState extends State<Dashboard> {
           icon: Icon(Icons.book),
           label: 'Recipe',
         ),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label:'Post'
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Post'),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_cart_rounded),
           label: 'Cart',
         ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.settings,
-            ),
-            label:'Settings',
+          icon: Icon(
+            Icons.settings,
+          ),
+          label: 'Settings',
         )
       ],
     );
   }
-
-
-
 }

@@ -5,6 +5,7 @@ import {
 	Typography,
 	useTheme,
 	TableSortLabel,
+	Grid,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
@@ -17,36 +18,64 @@ import { tokens } from "../../Theme";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Calendar from "react-calendar";
-
+import "react-calendar/dist/Calendar.css";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PeopleIcon from "@mui/icons-material/People";
+import DollarIcon from "@mui/icons-material/MonetizationOn";
+const Data = ({ title, value, icon: IconComponent }) => {
+	const theme = useTheme();
+	const colors = tokens(theme.palette.mode);
+	return (
+		<Box
+			display="flex"
+			sx={{
+				border: theme.palette.mode === "dark" ? `1px solid` : undefined,
+				borderColor: colors.primary[600],
+				borderLeft: "5px solid",
+				borderLeftColor: colors.redAccent[500],
+				height: "100px",
+				borderRadius: 2,
+				backgroundColor:
+					theme.palette.mode === "dark" ? colors.primary[400] : "white",
+			}}
+			alignItems={"center"}
+			justifyContent={"center"}
+		>
+			<Box mr={5} p={2}>
+				<Typography variant="h3">{title}</Typography>
+				<Typography variant="h1">{value}</Typography>
+			</Box>
+			<IconComponent sx={{ fontSize: 50, color: colors.grey[100], mr: 2 }} />
+		</Box>
+	);
+};
 const Dashboard = () => {
-	const columns = [
-		{ field: "id", headerName: "ID" },
+	const ordercol = [
 		{ field: "user", headerName: "Customer Name" },
 		{ field: "orderitems", headerName: "Order Items" },
 		{ field: "ordernotes", headerName: "Order Notes" },
 		{ field: "address", headerName: "Address" },
 		{ field: "price", headerName: "Price", type: "number", editable: true },
 		{ field: "payment_method", headerName: "Payment" },
-		{ field: "paymentstatus", headerName: "Payment Status" },
 		{ field: "status", headerName: "Status" },
 	];
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
-	const [errormessage, setErrorMessage] = useState("");
-	const [xAxis, setXAxis] = useState([]);
-	const [yAxis, setYAxis] = useState([]);
 	const [nooforders, setNoOfOrders] = useState(0);
 	const [todayorders, setTodayOrders] = useState(0);
 	const [orderBy, setOrderBy] = useState("");
 	const [orders, setOrders] = useState([]);
 	const [totalprice, setTotalPrice] = useState(0);
 	const today = new Date();
-	const [value, onChange] = useState(today);
 
 	useEffect(() => {
 		const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
 		const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+		if (tokenCookie === undefined) {
+			window.location.href = "/restaurant";
+		}
 		const token = tokenCookie.split("=")[1];
+
 		const data = JSON.parse(atob(token.split(".")[1]));
 		console.log(data);
 		const restroId = data.data.id;
@@ -95,12 +124,6 @@ const Dashboard = () => {
 							hourData[hour]++;
 						}
 					});
-					const xAxis = Object.keys(hourData).map((hour) => parseInt(hour));
-					const yAxis = Object.values(hourData);
-
-					// Update state variables
-					setXAxis(xAxis);
-					setYAxis(yAxis);
 				} else {
 					setErrorMessage(response.data["message"]);
 				}
@@ -119,83 +142,97 @@ const Dashboard = () => {
 					Dashboard
 				</Typography>
 			</Box>
-			<Box display={"flex"}>
-				<Box width={"60%"}>
-					<Paper
+			<Box mt={2} mr={5}>
+				<Grid container spacing={3}>
+					<Grid item xs={12} md={4}>
+						<Data
+							title="Total Orders"
+							value={nooforders}
+							icon={LocalShippingIcon}
+						/>
+					</Grid>
+					<Grid item xs={12} md={4}>
+						<Data title="Today Order" value={todayorders} icon={PeopleIcon} />
+					</Grid>
+					<Grid item xs={12} md={4}>
+						<Data title="Total Earned" value={totalprice} icon={DollarIcon} />
+					</Grid>
+				</Grid>
+			</Box>
+			<Box mt={5} mr={5}>
+				<Box
+					sx={{
+						backgroundColor:
+							theme.palette.mode === "dark" ? colors.primary[600] : "white",
+						borderRadius: 2,
+						padding: 1,
+					}}
+				>
+					<h1>Orders</h1>
+					<Box
 						sx={{
-							width: "100%",
-							borderRadius: "15px 15px 0 0",
+							overflow: "auto",
+							maxHeight: "500px",
 						}}
-						elevation={5}
 					>
-						<TableContainer
+						<Paper
 							sx={{
-								maxHeight: "73vh",
-								// borderRadius: "15px 15px 0 0",
-								backgroundColor:
-									theme.palette.mode === "dark" ? colors.primary[400] : "white",
+								width: "100%",
+								borderRadius: "15px 15px 0 0",
 							}}
+							elevation={5}
 						>
-							<Table>
-								<TableHead>
-									<TableRow>
-										{columns.map((column) => (
-											<TableCell
-												key={column.field}
-												sx={{
-													backgroundColor:
-														theme.palette.mode === "dark"
-															? colors.primary[700]
-															: colors.primary[600],
-													color: "white",
-												}}
-											>
-												{column.field !== "status" ? (
-													<TableSortLabel
-														active={orderBy === column.field}
-														direction={orderBy === column.field ? order : "asc"}
-														onClick={() => handleSort(column.field)}
-													>
-														{column.headerName}
-													</TableSortLabel>
-												) : (
-													column.headerName
-												)}
-											</TableCell>
-										))}
-									</TableRow>
-								</TableHead>
-								<TableBody>
-									{orders.map((row, index) => (
-										<TableRow key={index}>
-											{columns.map((column) => (
-												<TableCell key={column.field}>
-													{column.field === "orderitems" &&
-													Array.isArray(row[column.field])
-														? row[column.field].join(", ")
-														: column.field === "status" &&
-														  row.status !== "Delivered"
-														? row[column.field] // Only display the status value
-														: row[column.field]}
+							<TableContainer
+								sx={{
+									maxHeight: "73vh",
+									// borderRadius: "15px 15px 0 0",
+									backgroundColor:
+										theme.palette.mode === "dark"
+											? colors.primary[400]
+											: "white",
+								}}
+							>
+								<Table>
+									<TableHead>
+										<TableRow>
+											{ordercol.map((column) => (
+												<TableCell
+													key={column.field}
+													sx={{
+														backgroundColor:
+															theme.palette.mode === "dark"
+																? colors.primary[700]
+																: colors.primary[600],
+														color: "white",
+													}}
+												>
+													{column.headerName}
 												</TableCell>
 											))}
 										</TableRow>
-									))}
-								</TableBody>
-							</Table>
-						</TableContainer>
-					</Paper>
-					<Typography variant="h3" fontWeight="bold">
-						Total Orders: {nooforders}
-					</Typography>
-					<Typography variant="h3" fontWeight="bold">
-						Orders Today: {todayorders}
-					</Typography>
-					<Typography variant="h3" fontWeight="bold">
-						Total Income: {totalprice}
-					</Typography>
+									</TableHead>
+									<TableBody>
+										{orders.map((row, index) => (
+											<TableRow key={index}>
+												{ordercol.map((column) => (
+													<TableCell key={column.field}>
+														{column.field === "orderitems" &&
+														Array.isArray(row[column.field])
+															? row[column.field].join(", ")
+															: column.field === "status" &&
+															  row.status !== "Delivered"
+															? row[column.field] // Only display the status value
+															: row[column.field]}
+													</TableCell>
+												))}
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+							</TableContainer>
+						</Paper>
+					</Box>
 				</Box>
-				<Box>{/* <Calendar onChange={onChange} value={value} /> */}</Box>
 			</Box>
 		</Box>
 	);

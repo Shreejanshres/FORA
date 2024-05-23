@@ -68,7 +68,7 @@ class Order(models.Model):
     user = models.ForeignKey(CustomerUser, on_delete=models.CASCADE)
     restaurant= models.ForeignKey(RestaurantUser, on_delete=models.CASCADE)
     payment_method = models.CharField(max_length=50)
-    ispaid=models.BooleanField(default=False)
+    ispaid=models.BooleanField()
     address=models.CharField(max_length=100)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     PENDING = 'Pending'

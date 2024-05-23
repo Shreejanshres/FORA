@@ -16,6 +16,8 @@ import 'package:user/Pages/splashscreen.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:user/Theme/theme_provider.dart';
 
+import 'package:cupertino_icons/cupertino_icons.dart';
+
 void main() {
   GeocodingPlatform.instance = GeocodingPlatform.instance;
   runApp(ChangeNotifierProvider(

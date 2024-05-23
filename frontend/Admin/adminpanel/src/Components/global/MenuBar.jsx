@@ -64,13 +64,13 @@ const AdminItem = ({ isCollapsed, selected, setSelected }) => {
 				selected={selected}
 				setSelected={setSelected}
 			/>
-			<Item
+			{/* <Item
 				title="Payment"
 				to="/admin/payment"
 				icon={<PaymentsOutlinedIcon />}
 				selected={selected}
 				setSelected={setSelected}
-			/>
+			/> */}
 		</Box>
 	);
 };
@@ -104,13 +104,13 @@ const RestaurantItem = ({ isCollapsed, selected, setSelected }) => {
 				selected={selected}
 				setSelected={setSelected}
 			/>
-			<Item
+			{/* <Item
 				title="Payment"
 				to="/restaurant/payment"
 				icon={<PaymentsOutlinedIcon />}
 				selected={selected}
 				setSelected={setSelected}
-			/>
+			/> */}
 			<Item
 				title="Promotions"
 				to="/restaurant/promotion"

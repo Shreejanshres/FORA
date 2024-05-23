@@ -129,16 +129,19 @@ def addmenu(request):
             data_json = json.loads(request.body)
             print("Received data:", data_json)
 
-            tags = Tags.objects.get(id=data_json.get("tags"))
+            tags = Tags.objects.get(id=data_json.get("tag"))
             heading = Heading.objects.get(id=data_json.get("heading"))
             data_json["tag"] = tags.id
             data_json["heading"] = heading.id
             print("Processed data:", data_json)
+
             serializer = MenuSerializer(data=data_json)
             if serializer.is_valid():
                 serializer.save()
+                print("Menu added successfully")
                 return  JsonResponse({"success": True, "message": "Menu added successfully"})
             else:
+                print("Error adding menu:", serializer.errors   )
                 return JsonResponse({"success": False, "message": str(serializer.errors)})
         except Exception as e:
             print("Error processing request:", e)
@@ -149,11 +152,8 @@ def addmenu(request):
 @csrf_exempt
 def viewmenu(request):
     if request.method=="GET":
-        # data=json.loads(request.body)
-        # id=data.get( "id" )
-        # tag=data.get("tag")
         try:
-            menuitem=RestaurantUser.objects.all()
+            menuitem=RestaurantUser.objects.filter(open=True,is_active=True)
             serialized=DetailDataSerializer(menuitem,many=True)
             return  JsonResponse(serialized.data,safe=False)
         except:
@@ -407,18 +407,23 @@ def addtoorder(request):
             payment_method = data.get("payment_method")
             total_price = data.get("total_price")
             restro_id = data.get("restaurant_id")
+            print(restro_id)
             print(user_id, is_paid, address, payment_method, total_price)
             
             # Fetch user and restaurant instances
             user = CustomerUser.objects.get(id=user_id)
             restro = getrestro(user_id)  # Assuming this function returns the RestaurantUser instance
+            print(restro)
+            restaurant = RestaurantUser.objects.get(id=restro_id)
+            print(restaurant)
             
             # Check if all required fields are provided
             if None in [user, is_paid, address, payment_method, total_price, restro]:
                 raise ValueError("Required fields are missing")
             
             # Create order
-            order = Order.objects.create(user=user, restaurant=restro, ispaid=is_paid, address=address, 
+            print("paymet status",is_paid)
+            order = Order.objects.create(user=user, restaurant=restaurant, ispaid=is_paid, address=address, 
                                         payment_method=payment_method, total_price=total_price)
             
             # Get cart items
@@ -619,3 +624,17 @@ def deletepromotion(request,id):
             return JsonResponse({"success":False,"message":"Promotion not found"})
     else:
         return JsonResponse({"success":False,"message":"The method should be DELETE"})
+    
+
+
+@csrf_exempt
+def gettotalorder(request):
+    if request.method == "GET":
+        try:
+            orders = Order.objects.all().count()
+            print(orders)
+            return JsonResponse({'success': True, 'message': orders})
+        except Exception as e:
+            return JsonResponse({'success': False,"message": str(e)}, status=500)
+    else:
+        return JsonResponse({'success': False,"message": "The method should be GET"}, status=405)

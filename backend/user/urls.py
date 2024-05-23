@@ -35,4 +35,6 @@ urlpatterns = [
     path("getpostbyuser/<int:id>",getpostbyuser,name="getpostbyuser"),
     path("getrecipebyuser/<int:id>",getrecipebyuser,name="getrecipebyuser"),
 
+    path('gettotaluser/',gettotalusers,name="gettotalusers"),
+
 ]

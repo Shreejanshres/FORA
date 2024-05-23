@@ -18,11 +18,11 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   String userLocation = '';
   Restaurant restaurant = Restaurant(); // Initialize your Restaurant class
-  bool isLoading=true;
+  bool isLoading = true;
   late List<dynamic> alldata;
   late List<dynamic> allPromotion;
   String searchValue = '';
-  List<Map<String, dynamic>> suggestions=[];
+  List<Map<String, dynamic>> suggestions = [];
   @override
   void initState() {
     super.initState();
@@ -40,30 +40,33 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> getdata() async {
     try {
-      await restaurant.getrestaurantdata(); // Assuming getRestaurantData() is an asynchronous method
+      await restaurant
+          .getrestaurantdata(); // Assuming getRestaurantData() is an asynchronous method
       setState(() {
-        alldata=restaurant.restaurants;
+        alldata = restaurant.restaurants;
       });
     } catch (e) {
       // Handle error if any
       print('Error loading restaurant data: $e');
     }
   }
+
   Future<void> getpromotion() async {
     try {
-      var response =await restaurant.getpromotion(); // Assuming getRestaurantData() is an asynchronous method
-      if(response['success']){
+      var response = await restaurant
+          .getpromotion(); // Assuming getRestaurantData() is an asynchronous method
+      if (response['success']) {
         setState(() {
-          allPromotion=response['message'];
-          isLoading=false;
+          allPromotion = response['message'];
+          isLoading = false;
         });
-
       }
     } catch (e) {
       // Handle error if any
       print('Error loading promotion data: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,12 +98,14 @@ class _HomepageState extends State<Homepage> {
                 scrollDirection: Axis.horizontal,
                 itemCount: restaurant.restaurantNames.length,
                 itemBuilder: (context, index) {
-                  return restaurantDisplay( index);
+                  return restaurantDisplay(index);
                 },
               ),
             ),
             Text("Menu Items"),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             Container(
               height: 150,
               // color: Colors.red,
@@ -111,16 +116,16 @@ class _HomepageState extends State<Homepage> {
                   return SizedBox(width: 10); // Adjust the width as needed
                 },
                 itemBuilder: (BuildContext context, int index) {
-                  if (index < allPromotion.length &&
-                      allPromotion.isNotEmpty) {
-                    final randomIndex =
-                    Random().nextInt(allPromotion.length);
+                  if (index < allPromotion.length && allPromotion.isNotEmpty) {
+                    final randomIndex = Random().nextInt(allPromotion.length);
                     return promotion(randomIndex);
                   }
                 },
               ),
             ),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             Container(
               height: 250,
               color: Colors.red,
@@ -130,26 +135,33 @@ class _HomepageState extends State<Homepage> {
                   return SizedBox(width: 10); // Adjust the width as needed
                 },
                 itemBuilder: (BuildContext context, int index) {
-                  if (index < allPromotion.length &&
-                      allPromotion.isNotEmpty) {
-                    final randomIndex =
-                    Random().nextInt(allPromotion.length);
+                  if (index < allPromotion.length && allPromotion.isNotEmpty) {
+                    final randomIndex = Random().nextInt(allPromotion.length);
                     return Container(
-                      height: 250, // Set the height equal to the container height
+                      height:
+                          250, // Set the height equal to the container height
                       child: Image.network(
                         "${restaurant.baseUrl}${allPromotion[randomIndex]['picture']}",
-                        fit: BoxFit.cover, // Ensure the image fills the container
+                        fit: BoxFit
+                            .cover, // Ensure the image fills the container
                       ),
                     );
                   }
                 },
               ),
             ),
-            SizedBox(height: 10,),
-            Text("More restaurant",style: TextStyle(fontFamily: "Poppins",fontSize: 14),),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              "More restaurant",
+              style: TextStyle(fontFamily: "Poppins", fontSize: 14),
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Container(
-              child:  GridView.builder(
+              child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -162,9 +174,9 @@ class _HomepageState extends State<Homepage> {
                   if (index < restaurant.restaurantNames.length &&
                       restaurant.restaurantNames.isNotEmpty) {
                     final randomIndex =
-                    Random().nextInt(restaurant.restaurantNames.length);
+                        Random().nextInt(restaurant.restaurantNames.length);
                     return restaurantDisplay(randomIndex);
-                  }else {
+                  } else {
                     return const Placeholder();
                   }
                 },
@@ -210,8 +222,8 @@ class _HomepageState extends State<Homepage> {
   //   );
   // }
 
-
-  Future<List<Map<String, dynamic>>> _fetchSuggestions(String searchValue) async {
+  Future<List<Map<String, dynamic>>> _fetchSuggestions(
+      String searchValue) async {
     await Future.delayed(const Duration(milliseconds: 750));
 
     List<Map<String, dynamic>> suggestions = [];
@@ -222,17 +234,22 @@ class _HomepageState extends State<Homepage> {
     }
 
     suggestions = restaurant.restaurants
-        .where((restaurant) => restaurant['name'].toString().toLowerCase().contains(searchValue.toLowerCase()))
+        .where((restaurant) => restaurant['name']
+            .toString()
+            .toLowerCase()
+            .contains(searchValue.toLowerCase()))
         .map((restaurant) {
       return {
         'name': restaurant['name'].toString(),
-        'id': restaurant['id'], // Assuming ID is present in your restaurant data
+        'id':
+            restaurant['id'], // Assuming ID is present in your restaurant data
       };
     }).toList();
 
     return suggestions;
   }
-  EasySearchBar appBar(){
+
+  EasySearchBar appBar() {
     return EasySearchBar(
       backgroundColor: Colors.white,
       title: Column(
@@ -253,22 +270,25 @@ class _HomepageState extends State<Homepage> {
       ),
       onSearch: (value) => setState(() => searchValue = value),
       asyncSuggestions: (value) async {
-         suggestions = await _fetchSuggestions(value);
+        suggestions = await _fetchSuggestions(value);
         // Convert the List<Map<String, dynamic>> to List<String>
-        return suggestions.map((suggestion) => suggestion['name'].toString()).toList();
+        return suggestions
+            .map((suggestion) => suggestion['name'].toString())
+            .toList();
       },
       onSuggestionTap: (String suggestion) {
-        var selectedSuggestion = suggestions.firstWhere((s) => s['name'] == suggestion);
-        Navigator.pushNamed(context, '/restaurantpage', arguments: selectedSuggestion['id']);
+        var selectedSuggestion =
+            suggestions.firstWhere((s) => s['name'] == suggestion);
+        Navigator.pushNamed(context, '/restaurantpage',
+            arguments: selectedSuggestion['id']);
       },
     );
   }
 
   InkWell restaurantDisplay(int index) {
     String name = restaurant.restaurants[index]['name'];
-    String pictureUrl =
-        restaurant.restaurants[index]['picture'] ?? '';
-    int id= restaurant.restaurants[index]['id'] ?? 0;
+    String pictureUrl = restaurant.restaurants[index]['picture'] ?? '';
+    int id = restaurant.restaurants[index]['id'] ?? 0;
     return InkWell(
       onTap: () {
         Navigator.pushNamed(context, '/restaurantpage', arguments: id);
@@ -281,13 +301,17 @@ class _HomepageState extends State<Homepage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-           pictureUrl.isNotEmpty?
-           Image.network(
-             restaurant.baseUrl+pictureUrl,
-             width: 50,
-             height: 50,
-           ) :
-           Image.asset('images/Logo.png',width: 50,height: 50,),
+            pictureUrl.isNotEmpty
+                ? Image.network(
+                    restaurant.baseUrl + pictureUrl,
+                    width: 50,
+                    height: 50,
+                  )
+                : Image.asset(
+                    'images/Logo.png',
+                    width: 50,
+                    height: 50,
+                  ),
             Text(name),
           ],
         ),
@@ -295,12 +319,13 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  Widget promotion(index){
+  Widget promotion(index) {
     return InkWell(
-      onTap: (){
-        Navigator.pushNamed(context, '/restaurantpage', arguments: allPromotion[index]['restaurant']['id']);
+      onTap: () {
+        Navigator.pushNamed(context, '/restaurantpage',
+            arguments: allPromotion[index]['restaurant']['id']);
       },
-      child:Container(
+      child: Container(
         width: 120,
         decoration: BoxDecoration(
           // color: Colors.white,
@@ -317,14 +342,24 @@ class _HomepageState extends State<Homepage> {
             Container(
               width: double.infinity,
               height: 110,
-              child: Image.network("${restaurant.baseUrl}${allPromotion[index]['picture']}",fit: BoxFit.cover, ),
+              child: Image.network(
+                "${restaurant.baseUrl}${allPromotion[index]['picture']}",
+                fit: BoxFit.cover,
+              ),
             ),
-            SizedBox(height: 10,),
-            Text("${allPromotion[index]['restaurant']['name']}",style: TextStyle(fontFamily: "Poppins",fontSize: 15,),)
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              "${allPromotion[index]['restaurant']['name']}",
+              style: TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 15,
+              ),
+            )
           ],
         ),
       ),
     );
   }
-
 }

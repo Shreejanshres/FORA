@@ -6,6 +6,7 @@ import {
 	Input,
 	useTheme,
 	TextField,
+	Divider,
 } from "@mui/material";
 import { tokens } from "../../Theme";
 import axios from "axios";
@@ -160,23 +161,26 @@ export default function UserProfile() {
 						pt: 1,
 					}}
 				>
-					<Typography variant="h3">Name: {name}</Typography>
-					<Typography variant="h3">Email: {email}</Typography>
-					<Typography variant="h3">Phone: {phone}</Typography>
-					<Typography variant="h3">Address: {address}</Typography>
+					<Typography variant="h4">Name: {name}</Typography>
+					<Typography variant="h4">Email: {email}</Typography>
+					<Typography variant="h4">Phone: {phone}</Typography>
+					<Typography variant="h4">Address: {address}</Typography>
+				</Box>
+				<Divider orientation="vertical" flexItem />
+				<Box ml={5}>
+					<Typography variant="h3">Delivery Time:</Typography>
+					<TextField
+						value={delivery}
+						onChange={(e) => setDelivery(e.target.value)}
+					/>
+					<Typography variant="h3">Description:</Typography>
+					<TextField
+						value={description}
+						onChange={(e) => setDescription(e.target.value)}
+					/>
 				</Box>
 			</Box>
-			<Box mt={2} width={60} display={"flex"} flexDirection={"column"}>
-				<Typography variant="h3">Delivery Time:</Typography>
-				<TextField
-					value={delivery}
-					onChange={(e) => setDelivery(e.target.value)}
-				/>
-				<Typography variant="h3">Description:</Typography>
-				<TextField
-					value={description}
-					onChange={(e) => setDescription(e.target.value)}
-				/>
+			<Box display={"flex"} mt={2} justifyContent={"center"}>
 				<Button
 					variant="contained"
 					sx={{ backgroundColor: colors.blueAccent[700] }}

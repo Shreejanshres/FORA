@@ -20,14 +20,17 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import Help from "@mui/icons-material/Help";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const Topbar = () => {
 	const [picture, setPicture] = useState("");
 	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
 	const theme = useTheme();
 	const colors = tokens(theme.palette.mode);
 	const colorMode = useContext(ColorModeContext);
 	const [is_restaurant, setIsRestaurant] = useState(false);
 	const [isRestaurantOpen, setIsRestaurantOpen] = useState(false);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (window.location.pathname.includes("/restaurant")) {
@@ -46,6 +49,7 @@ const Topbar = () => {
 			setName(data.data.name);
 			setPicture(data.data.picture);
 			setIsRestaurantOpen(data.data.open);
+			setEmail(data.data.email);
 		}
 	}, []);
 
@@ -63,7 +67,9 @@ const Topbar = () => {
 			window.location.href = "/restaurant";
 		}
 	};
-
+	const handleClick = () => {
+		navigate("/restaurant/changepassword", { state: { email } });
+	};
 	const handleUser = () => {
 		if (window.location.pathname.includes("/restaurant")) {
 			window.location.href = "/restaurant/profile";
@@ -166,6 +172,8 @@ const Topbar = () => {
 						</Box>
 					</MenuItem>
 					<MenuItem onClick={handlelogout}>Log Out</MenuItem>
+					if(window.location.pathname.includes("/restaurant"))
+					{<MenuItem onClick={handleClick}>Change Password</MenuItem>}
 				</Select>
 			</FormControl>
 		</Box>

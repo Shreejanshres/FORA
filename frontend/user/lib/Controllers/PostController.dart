@@ -20,9 +20,8 @@ class Post{
   List<Map<String, dynamic>> data = [];
   List<Map<String, dynamic>> commentdata = [];
   bool isLoading=true;
-  // String baseUrl='http://10.22.10.79:8000';
-  String baseUrl='http://192.168.1.66:8000';
-  // String baseUrl='http://10.22.31.33:8000';
+  String baseUrl='http://10.22.17.145:8000';
+  // String baseUrl='http://192.168.1.103:8000';
   // String baseUrl='http://shresthashreejan.com.np';
 
   Future<int?> getData()async {

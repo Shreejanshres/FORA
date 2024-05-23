@@ -3,10 +3,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:dio/dio.dart";
 class Order{
-  // String baseUrl='http://10.22.10.79:8000';
-  String baseUrl='http://192.168.1.66:8000';
-  // String baseUrl='http://10.22.31.33:8000';
-  // String baseUrl='http://192.168.1.116:8000';
+  String baseUrl='http://10.22.17.145:8000';
+  // String baseUrl='http://192.168.1.103:8000';
   // String baseUrl='http://shresthashreejan.com.np';
    List<dynamic> cartitem=[];
   List<dynamic> names=[];

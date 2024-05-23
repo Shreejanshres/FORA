@@ -104,7 +104,7 @@ def addrestaurant(request):
 @csrf_exempt
 def getrestaurantdata(request):
     if request.method=="GET":
-        alldata= RestaurantUser.objects.filter(open=True)
+        alldata= RestaurantUser.objects.all()
         serialized_data = RestaurantUserSerializer(alldata,many=True)
         return JsonResponse(serialized_data.data,safe=False)
     else:

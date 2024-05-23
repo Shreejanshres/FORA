@@ -6,12 +6,9 @@ class Restaurant {
   List<dynamic> restaurants = [];
   Map<String, dynamic> restrodata = {};
   List<dynamic> headingdata = [];
-  // String baseUrl = 'http://10.22.31.33:8000';
-  String baseUrl='http://192.168.1.66:8000';
-  // String baseUrl='http://172.23.240.1:8000';
+  String baseUrl='http://10.22.17.145:8000';
+  // String baseUrl='http://192.168.1.103:8000';
   // String baseUrl='http://shresthashreejan.com.np';
-  // String baseUrl='http://192.168.1.116:8000';
-
   Future<void> getrestaurantdata() async {
     try {
       var response = await Dio().get('$baseUrl/restaurant/viewmenu/');
@@ -69,7 +66,7 @@ class Restaurant {
         .map((restaurant) {
       return {
         'name': restaurant['name'].toString(),
-        'id': restaurant['id'], // Assuming ID is present in your restaurant data
+        'id': restaurant['id'], 
       };
     }).toList();
 

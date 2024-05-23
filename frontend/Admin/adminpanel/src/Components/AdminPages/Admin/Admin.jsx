@@ -45,25 +45,6 @@ const rows = [
     ownerName: "John Doe",
   },
 ];
-const CssTextField = styled(TextField)(({ theme }) => ({
-  "& label.Mui-focused": {
-    color: theme.palette.mode === "dark" ? "white" : "black",
-  },
-  "& .MuiOutlinedInput-focused": {
-    color: "blue",
-  },
-  "& .MuiInput-underline:after": {
-    borderBottomColor: theme.palette.mode === "dark" ? "white" : "black",
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: theme.palette.mode === "dark" ? "white" : "black",
-    },
-    "&:hover fieldset": {
-      borderColor: theme.palette.mode === "dark" ? "white" : "black",
-    },
-  },
-}));
 
 const Restaurant = () => {
   const theme = useTheme();
@@ -103,18 +84,7 @@ const Restaurant = () => {
           justifyContent: "space-between",
         }}
       >
-        <CssTextField
-          label="Search"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton edge="end">
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        <Box></Box>
         <Button
           variant="contained"
           sx={{

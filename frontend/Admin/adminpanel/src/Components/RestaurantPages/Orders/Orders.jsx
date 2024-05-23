@@ -58,7 +58,8 @@ export default function Orders() {
 							),
 							ordernotes: order.order_items.map((item) => item.notes),
 							price: order.total_price,
-							paymentstatus: order.payment_status ? "Paid" : "Unpaid",
+
+							paymentstatus: order.ispaid ? "Paid" : "Unpaid",
 						}));
 						setOrders(formattedOrders);
 					}
@@ -118,7 +119,7 @@ export default function Orders() {
 				>
 					<TableContainer
 						sx={{
-							maxHeight: "73vh",
+							maxHeight: "80vh",
 							// borderRadius: "15px 15px 0 0",
 							backgroundColor:
 								theme.palette.mode === "dark" ? colors.primary[400] : "white",

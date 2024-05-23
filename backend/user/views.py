@@ -38,6 +38,7 @@ def signup(request):
             return JsonResponse({"success":True,"message": "Signup successful"})
         else:
             # If the data is not valid, return the errors
+            print(serializer.errors)
             return JsonResponse({"success":False,"message": "Invalid data", "errors": serializer.errors})
     return JsonResponse({"success":False,"message": "The request should be POST"})
 
@@ -480,5 +481,14 @@ def getrecipebyuser(request,id):
         recipes = Recipe.objects.filter(user=id).all()
         serializer = RecipeSerializer(recipes, many=True)
         return JsonResponse({"success":True,"message":serializer.data})
+    else:
+        return JsonResponse({"success":False,"message":"The request should be GET"})
+
+
+@csrf_exempt
+def gettotalusers(request):
+    if request.method == 'GET':
+        users = CustomerUser.objects.all().count()
+        return JsonResponse({"success":True,"message":users})
     else:
         return JsonResponse({"success":False,"message":"The request should be GET"})

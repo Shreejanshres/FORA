@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:user/Controllers/UserController.dart';
 import 'package:user/Pages/forgotpassword.dart';
 import 'package:user/Pages/loginPage.dart';
 import 'package:user/Theme/theme_provider.dart';
@@ -47,9 +48,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget body(String data) {
-    // String baseUrl = 'https://shreejan.pythonanywhere.com';
-    String baseUrl = 'http://192.168.1.66:8000';
-    // String baseUrl='http://192.168.1.116:8000';
+    print(data);
+    User user = User();
     return Container(
       width: double.infinity,
       child: Column(
@@ -64,9 +64,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       image: data != 'no data'
-                          ? NetworkImage('$baseUrl$data')
+                          ? NetworkImage('${user.baseUrl}$data')
                               as ImageProvider<Object>
-                          : AssetImage('images/defaultimage.png'),
+                          : const AssetImage('images/defaultimage.png'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -74,7 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SizedBox(height: 10),
                 OutlinedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context,'/editprofile');
+                    Navigator.pushNamed(context, '/editprofile');
                   },
                   child: Text(
                     "Edit Profile",
@@ -86,7 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
           SizedBox(height: 20),
           InkWell(
             onTap: () {
-              Navigator.pushNamed(context,'/profile');
+              Navigator.pushNamed(context, '/profile');
             },
             child: ListTile(
               title: Text("Accounts"),
@@ -98,8 +98,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const ForgotPassword()),
+                MaterialPageRoute(builder: (context) => const ForgotPassword()),
               );
             },
             child: ListTile(
@@ -112,29 +111,27 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: () {
               Navigator.pushNamed(context, '/orderhistory');
             },
-            child: ListTile(
+            child: const ListTile(
               title: Text("Order History"),
               leading: Icon(Icons.shopping_basket),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           InkWell(
             onTap: () {},
-            child: ListTile(
+            child: const ListTile(
               title: Text("FAQ"),
               leading: Icon(Icons.question_answer),
             ),
           ),
-
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           InkWell(
-            onTap: () async{
+            onTap: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.clear();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const LoginPage()),
+                MaterialPageRoute(builder: (context) => const LoginPage()),
               );
             },
             child: ListTile(
@@ -142,17 +139,17 @@ class _SettingsPageState extends State<SettingsPage> {
               leading: Icon(Icons.output),
             ),
           ),
-          Switch(
-            value: light,
-            activeColor: Colors.grey.shade600,
-            onChanged: (bool value) {
-              setState(() {
-                Provider.of<ThemeProvider>(context, listen: false)
-                    .toggleTheme();
-                light = value;
-              });
-            },
-          )
+          // Switch(
+          //   value: light,
+          //   activeColor: Colors.grey.shade600,
+          //   onChanged: (bool value) {
+          //     setState(() {
+          //       Provider.of<ThemeProvider>(context, listen: false)
+          //           .toggleTheme();
+          //       light = value;
+          //     });
+          //   },
+          // )
         ],
       ),
     );

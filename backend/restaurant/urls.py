@@ -33,5 +33,6 @@ urlpatterns = [
     path("getpromotionbyid/<int:id>/",getpromotionbyid,name="getpromotionbyid"),
     path("deletepromotion/<int:id>/",deletepromotion,name="deletepromotion"),
 
+    path("gettotalorder/",gettotalorder,name="gettotalorder"),
 ]
 
