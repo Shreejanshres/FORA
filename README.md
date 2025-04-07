@@ -1,4 +1,4 @@
-# FORA
+# FORA (Food Fuse)
 
 Final year Project:
 
